@@ -9,6 +9,9 @@ import Shop from "./pages/Shop";
 import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
 import Checkout from "./pages/Checkout";
+import Auth from "./pages/Auth";
+import Account from "./pages/Account";
+import ResetPassword from "./pages/ResetPassword";
 import AdminLogin from "./pages/AdminLogin";
 import AdminLayout from "./pages/AdminLayout";
 import AdminProducts from "./pages/AdminProducts";
@@ -31,6 +34,9 @@ const App = () => (
             <Route path="/product/:slug" element={<ProductDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/checkout" element={<Checkout />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/account" element={<Account />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/admin/login" element={<AdminLogin />} />
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminProducts />} />

@@ -1,12 +1,21 @@
 import { Link } from "react-router-dom";
-import { ShoppingBag, Menu, X, User } from "lucide-react";
-import { useState } from "react";
+import { ShoppingBag, Menu, X, User, Heart } from "lucide-react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.jpeg";
+import type { Session } from "@supabase/supabase-js";
 
 const Navbar = () => {
   const { itemCount, setIsOpen } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => setSession(session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => setSession(session));
+    return () => subscription.unsubscribe();
+  }, []);
 
   const navLinks = [
     { label: "Home", to: "/" },
@@ -42,7 +51,12 @@ const Navbar = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <Link to="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
+          {session && (
+            <Link to="/account" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Heart size={20} />
+            </Link>
+          )}
+          <Link to={session ? "/account" : "/auth"} className="text-muted-foreground hover:text-foreground transition-colors">
             <User size={20} />
           </Link>
           <button onClick={() => setIsOpen(true)} className="relative text-foreground hover:text-primary transition-colors">
@@ -69,6 +83,13 @@ const Navbar = () => {
               {link.label}
             </Link>
           ))}
+          <Link
+            to={session ? "/account" : "/auth"}
+            onClick={() => setMobileOpen(false)}
+            className="block font-body text-sm tracking-widest uppercase text-foreground hover:text-primary"
+          >
+            {session ? "My Account" : "Sign In"}
+          </Link>
         </div>
       )}
     </nav>

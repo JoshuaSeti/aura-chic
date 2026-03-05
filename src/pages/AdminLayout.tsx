@@ -11,16 +11,32 @@ const AdminLayout = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const checkAdmin = async (session: Session | null) => {
+      if (!session) {
+        navigate("/admin/login");
+        return;
+      }
+      // Check admin role
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", session.user.id)
+        .eq("role", "admin")
+        .maybeSingle();
+      if (!data) {
+        navigate("/admin/login");
+        return;
+      }
       setSession(session);
       setLoading(false);
-      if (!session) navigate("/admin/login");
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      checkAdmin(session);
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-      if (!session) navigate("/admin/login");
+      checkAdmin(session);
     });
 
     return () => subscription.unsubscribe();

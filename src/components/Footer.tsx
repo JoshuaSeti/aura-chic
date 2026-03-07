@@ -37,10 +37,13 @@ const Footer = () => (
           </ul>
         </div>
       </div>
-      <div className="border-t border-secondary/20 mt-12 pt-6 text-center">
+      <div className="border-t border-secondary/20 mt-12 pt-6 text-center space-y-2">
         <p className="font-body text-xs text-secondary-foreground/50">
           © 2026 SosoFab Lifestyle. All rights reserved.
         </p>
+        <Link to="/admin/login" className="font-body text-xs text-secondary-foreground/30 hover:text-secondary-foreground/50 transition-colors">
+          Admin
+        </Link>
       </div>
     </div>
   </footer>

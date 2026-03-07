@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      automatic_discounts: {
+        Row: {
+          active: boolean
+          applies_to: string
+          applies_to_id: string | null
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          min_order_amount: number | null
+          name: string
+          starts_at: string | null
+        }
+        Insert: {
+          active?: boolean
+          applies_to?: string
+          applies_to_id?: string | null
+          created_at?: string
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          min_order_amount?: number | null
+          name: string
+          starts_at?: string | null
+        }
+        Update: {
+          active?: boolean
+          applies_to?: string
+          applies_to_id?: string | null
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          min_order_amount?: number | null
+          name?: string
+          starts_at?: string | null
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -41,12 +86,59 @@ export type Database = {
         }
         Relationships: []
       }
+      discount_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          description: string | null
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          min_order_amount: number | null
+          starts_at: string | null
+          used_count: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          description?: string | null
+          discount_type: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          min_order_amount?: number | null
+          starts_at?: string | null
+          used_count?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          description?: string | null
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          min_order_amount?: number | null
+          starts_at?: string | null
+          used_count?: number
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           created_at: string
           customer_email: string
           customer_name: string
           customer_phone: string | null
+          discount_amount: number | null
+          discount_code: string | null
           id: string
           items: Json
           shipping_address: string
@@ -59,6 +151,8 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone?: string | null
+          discount_amount?: number | null
+          discount_code?: string | null
           id?: string
           items?: Json
           shipping_address: string
@@ -71,6 +165,8 @@ export type Database = {
           customer_email?: string
           customer_name?: string
           customer_phone?: string | null
+          discount_amount?: number | null
+          discount_code?: string | null
           id?: string
           items?: Json
           shipping_address?: string

@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { getProductImage } from "@/lib/productImages";
+import { formatPrice } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
 const CartDrawer = () => {

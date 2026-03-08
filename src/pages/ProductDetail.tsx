@@ -142,13 +142,32 @@ const ProductDetail = () => {
               </div>
             )}
 
-            <Button
-              onClick={handleAddToCart}
-              disabled={!product.in_stock}
-              className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-6 hover:bg-primary/90 disabled:opacity-50"
-            >
-              {product.in_stock ? "Add to Bag" : "Sold Out"}
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleAddToCart}
+                disabled={!product.in_stock}
+                className="flex-1 bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-6 hover:bg-primary/90 disabled:opacity-50"
+              >
+                {product.in_stock ? "Add to Bag" : "Sold Out"}
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-auto aspect-square border-border hover:bg-muted"
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    navigate("/auth");
+                    return;
+                  }
+                  toggleWishlist(product.id);
+                }}
+              >
+                <Heart
+                  size={18}
+                  className={isInWishlist(product.id) ? "fill-destructive text-destructive" : "text-foreground"}
+                />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

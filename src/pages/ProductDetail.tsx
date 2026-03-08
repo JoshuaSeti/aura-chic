@@ -7,6 +7,7 @@ import CartDrawer from "@/components/CartDrawer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { getProductImage } from "@/lib/productImages";
+import { formatPrice } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 

@@ -7,9 +7,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
+
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
 const AdminProducts = () => {
   const queryClient = useQueryClient();

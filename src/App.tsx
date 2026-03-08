@@ -17,6 +17,7 @@ import AdminLayout from "./pages/AdminLayout";
 import AdminProducts from "./pages/AdminProducts";
 import AdminOrders from "./pages/AdminOrders";
 import AdminCategories from "./pages/AdminCategories";
+import AdminHero from "./pages/AdminHero";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();

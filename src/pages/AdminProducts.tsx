@@ -101,8 +101,23 @@ const AdminProducts = () => {
   };
 
   const handleSave = () => {
-    const { categories: _cat, ...rest } = editProduct;
-    saveMutation.mutate(rest);
+    const payload: any = {
+      name: editProduct.name,
+      slug: editProduct.slug,
+      description: editProduct.description || null,
+      price: editProduct.price,
+      compare_at_price: editProduct.compare_at_price || null,
+      category_id: editProduct.category_id || null,
+      image_url: editProduct.image_url || null,
+      in_stock: editProduct.in_stock,
+      featured: editProduct.featured,
+      sizes: editProduct.sizes || [],
+      colors: editProduct.colors || [],
+    };
+    if (editProduct.id) {
+      payload.id = editProduct.id;
+    }
+    saveMutation.mutate(payload);
   };
 
   return (

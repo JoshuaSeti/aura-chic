@@ -16,6 +16,6 @@ const slugToImage: Record<string, string> = {
 };
 
 export const getProductImage = (slug: string, imageUrl?: string | null): string => {
-  if (imageUrl && imageUrl.length > 0) return imageUrl;
+  if (imageUrl && imageUrl.trim().length > 0 && imageUrl.startsWith("http")) return imageUrl;
   return slugToImage[slug] || product1;
 };

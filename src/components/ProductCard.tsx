@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
 import { getProductImage } from "@/lib/productImages";
+import { formatPrice } from "@/lib/utils";
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/hooks/useWishlist";
 

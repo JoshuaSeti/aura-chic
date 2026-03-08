@@ -7,14 +7,42 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
+
+const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
 const AdminProducts = () => {
   const queryClient = useQueryClient();
   const [editProduct, setEditProduct] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Image must be under 3MB");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("File must be an image");
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const fileName = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(fileName, file);
+    if (error) {
+      toast.error("Upload failed: " + error.message);
+      setUploading(false);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(fileName);
+    setEditProduct((prev: any) => ({ ...prev, image_url: urlData.publicUrl }));
+    setUploading(false);
+    toast.success("Image uploaded");
+  };
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],
@@ -161,8 +189,39 @@ const AdminProducts = () => {
                 </Select>
               </div>
               <div>
-                <label className="font-body text-xs tracking-wider uppercase block mb-1">Image URL</label>
-                <Input value={editProduct.image_url || ""} onChange={(e) => setEditProduct({ ...editProduct, image_url: e.target.value })} />
+                <label className="font-body text-xs tracking-wider uppercase block mb-1">Product Image</label>
+                {editProduct.image_url && (
+                  <img src={editProduct.image_url} alt="Preview" className="w-20 h-20 object-cover rounded mb-2 border border-border" />
+                )}
+                <div className="flex gap-2">
+                  <Input
+                    value={editProduct.image_url || ""}
+                    onChange={(e) => setEditProduct({ ...editProduct, image_url: e.target.value })}
+                    placeholder="Image URL or upload"
+                    className="flex-1"
+                  />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(file);
+                      e.target.value = "";
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    disabled={uploading}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Max 3MB per image</p>
               </div>
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 font-body text-sm">

@@ -20,7 +20,6 @@ const ProductDetail = () => {
   const { isInWishlist, toggleWishlist, isAuthenticated } = useWishlist();
   const [selectedSize, setSelectedSize] = useState<string>();
   const [selectedColor, setSelectedColor] = useState<string>();
-  const [selectedColor, setSelectedColor] = useState<string>();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],

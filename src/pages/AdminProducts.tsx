@@ -17,6 +17,32 @@ const AdminProducts = () => {
   const queryClient = useQueryClient();
   const [editProduct, setEditProduct] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (file: File) => {
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Image must be under 3MB");
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      toast.error("File must be an image");
+      return;
+    }
+    setUploading(true);
+    const ext = file.name.split(".").pop();
+    const fileName = `${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from("product-images").upload(fileName, file);
+    if (error) {
+      toast.error("Upload failed: " + error.message);
+      setUploading(false);
+      return;
+    }
+    const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(fileName);
+    setEditProduct((prev: any) => ({ ...prev, image_url: urlData.publicUrl }));
+    setUploading(false);
+    toast.success("Image uploaded");
+  };
 
   const { data: products, isLoading } = useQuery({
     queryKey: ["admin-products"],

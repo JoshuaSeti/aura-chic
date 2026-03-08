@@ -109,7 +109,7 @@ const Checkout = () => {
               ))}
               <div className="border-t border-border pt-4 flex justify-between">
                 <span className="font-body font-semibold">Total</span>
-                <span className="font-body font-semibold text-lg">${total.toFixed(2)}</span>
+                <span className="font-body font-semibold text-lg">{formatPrice(total)}</span>
               </div>
             </div>
           </div>

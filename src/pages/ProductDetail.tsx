@@ -84,10 +84,10 @@ const ProductDetail = () => {
             </div>
 
             <div className="flex items-baseline gap-3">
-              <span className="font-body text-2xl font-semibold">${product.price.toFixed(2)}</span>
+              <span className="font-body text-2xl font-semibold">{formatPrice(product.price)}</span>
               {hasDiscount && (
                 <span className="font-body text-lg text-muted-foreground line-through">
-                  ${product.compare_at_price!.toFixed(2)}
+                  {formatPrice(product.compare_at_price!)}
                 </span>
               )}
             </div>

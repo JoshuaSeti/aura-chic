@@ -37,10 +37,10 @@ const ProductCard = ({ product }: { product: Product }) => {
         <div className="mt-3 space-y-1">
           <h3 className="font-display text-lg group-hover:text-primary transition-colors">{product.name}</h3>
           <div className="flex items-center gap-2">
-            <span className="font-body text-sm font-semibold">${product.price.toFixed(2)}</span>
+            <span className="font-body text-sm font-semibold">{formatPrice(product.price)}</span>
             {hasDiscount && (
               <span className="font-body text-xs text-muted-foreground line-through">
-                ${product.compare_at_price!.toFixed(2)}
+                {formatPrice(product.compare_at_price!)}
               </span>
             )}
           </div>

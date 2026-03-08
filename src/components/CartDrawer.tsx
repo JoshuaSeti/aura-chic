@@ -61,7 +61,7 @@ const CartDrawer = () => {
             <div className="border-t border-border pt-4 space-y-3">
               <div className="flex justify-between font-body">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-semibold">${total.toFixed(2)}</span>
+                <span className="font-semibold">{formatPrice(total)}</span>
               </div>
               <Link to="/checkout" onClick={() => setIsOpen(false)}>
                 <Button className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-sm hover:bg-primary/90">

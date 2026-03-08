@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { getProductImage } from "@/lib/productImages";
+import { formatPrice } from "@/lib/utils";
 
 const Checkout = () => {
   const { items, total, clearCart } = useCart();
@@ -88,7 +89,7 @@ const Checkout = () => {
               disabled={loading}
               className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-6 hover:bg-primary/90"
             >
-              {loading ? "Placing Order..." : `Place Order — $${total.toFixed(2)}`}
+              {loading ? "Placing Order..." : `Place Order — ${formatPrice(total)}`}
             </Button>
           </form>
 
@@ -103,12 +104,12 @@ const Checkout = () => {
                     <p className="font-body text-sm">{item.product.name}</p>
                     <p className="font-body text-xs text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
-                  <p className="font-body text-sm font-semibold">${(item.product.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-body text-sm font-semibold">{formatPrice(item.product.price * item.quantity)}</p>
                 </div>
               ))}
               <div className="border-t border-border pt-4 flex justify-between">
                 <span className="font-body font-semibold">Total</span>
-                <span className="font-body font-semibold text-lg">${total.toFixed(2)}</span>
+                <span className="font-body font-semibold text-lg">{formatPrice(total)}</span>
               </div>
             </div>
           </div>

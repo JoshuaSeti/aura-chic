@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { getProductImage } from "@/lib/productImages";
+import { formatPrice } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
 const CartDrawer = () => {
@@ -38,7 +39,7 @@ const CartDrawer = () => {
                       <p className="text-xs text-muted-foreground font-body">Color: {item.selectedColor}</p>
                     )}
                     <p className="text-sm font-body font-semibold text-primary mt-1">
-                      ${item.product.price.toFixed(2)}
+                      {formatPrice(item.product.price)}
                     </p>
                     <div className="flex items-center gap-2 mt-2">
                       <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="p-1 rounded hover:bg-muted">
@@ -60,7 +61,7 @@ const CartDrawer = () => {
             <div className="border-t border-border pt-4 space-y-3">
               <div className="flex justify-between font-body">
                 <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-semibold">${total.toFixed(2)}</span>
+                <span className="font-semibold">{formatPrice(total)}</span>
               </div>
               <Link to="/checkout" onClick={() => setIsOpen(false)}>
                 <Button className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-sm hover:bg-primary/90">

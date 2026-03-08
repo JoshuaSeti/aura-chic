@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { formatPrice } from "@/lib/utils";
 
 const statusColors: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -65,7 +66,7 @@ const AdminOrders = () => {
                     <p className="font-body text-xs text-muted-foreground">{order.customer_email}</p>
                   </div>
                 </TableCell>
-                <TableCell className="font-body text-sm font-semibold">${order.total.toFixed(2)}</TableCell>
+                <TableCell className="font-body text-sm font-semibold">{formatPrice(order.total)}</TableCell>
                 <TableCell>
                   <Select value={order.status} onValueChange={(v) => updateStatus.mutate({ id: order.id, status: v })}>
                     <SelectTrigger className="w-32">

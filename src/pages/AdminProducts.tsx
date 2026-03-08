@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { formatPrice } from "@/lib/utils";
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
@@ -179,7 +180,7 @@ const AdminProducts = () => {
               <TableRow key={p.id}>
                 <TableCell className="font-body text-sm">{p.name}</TableCell>
                 <TableCell className="font-body text-sm text-muted-foreground">{p.categories?.name || "—"}</TableCell>
-                <TableCell className="font-body text-sm">${p.price.toFixed(2)}</TableCell>
+                <TableCell className="font-body text-sm">{formatPrice(p.price)}</TableCell>
                 <TableCell><span className={`font-body text-xs ${p.in_stock ? "text-green-600" : "text-destructive"}`}>{p.in_stock ? "In Stock" : "Out"}</span></TableCell>
                 <TableCell><span className={`font-body text-xs ${p.featured ? "text-primary" : "text-muted-foreground"}`}>{p.featured ? "Yes" : "No"}</span></TableCell>
                 <TableCell>

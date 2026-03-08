@@ -7,6 +7,7 @@ import CartDrawer from "@/components/CartDrawer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { getProductImage } from "@/lib/productImages";
+import { formatPrice } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -83,10 +84,10 @@ const ProductDetail = () => {
             </div>
 
             <div className="flex items-baseline gap-3">
-              <span className="font-body text-2xl font-semibold">${product.price.toFixed(2)}</span>
+              <span className="font-body text-2xl font-semibold">{formatPrice(product.price)}</span>
               {hasDiscount && (
                 <span className="font-body text-lg text-muted-foreground line-through">
-                  ${product.compare_at_price!.toFixed(2)}
+                  {formatPrice(product.compare_at_price!)}
                 </span>
               )}
             </div>

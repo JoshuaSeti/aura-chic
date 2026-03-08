@@ -14,6 +14,8 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/utils";
 
+const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 
 const AdminProducts = () => {

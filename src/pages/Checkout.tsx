@@ -104,7 +104,7 @@ const Checkout = () => {
                     <p className="font-body text-sm">{item.product.name}</p>
                     <p className="font-body text-xs text-muted-foreground">Qty: {item.quantity}</p>
                   </div>
-                  <p className="font-body text-sm font-semibold">${(item.product.price * item.quantity).toFixed(2)}</p>
+                  <p className="font-body text-sm font-semibold">{formatPrice(item.product.price * item.quantity)}</p>
                 </div>
               ))}
               <div className="border-t border-border pt-4 flex justify-between">

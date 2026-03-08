@@ -279,8 +279,8 @@ const AdminProducts = () => {
                   Featured
                 </label>
               </div>
-              <Button onClick={handleSave} disabled={saveMutation.isPending} className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-5">
-                {saveMutation.isPending ? "Saving..." : "Save Product"}
+              <Button onClick={handleSave} disabled={saveMutation.isPending || uploading} className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-5">
+                {uploading ? "Uploading image..." : saveMutation.isPending ? "Saving..." : "Save Product"}
               </Button>
             </div>
           )}

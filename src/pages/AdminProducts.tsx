@@ -29,19 +29,45 @@ const AdminProducts = () => {
       toast.error("File must be an image");
       return;
     }
+
     setUploading(true);
     const ext = file.name.split(".").pop();
     const fileName = `${crypto.randomUUID()}.${ext}`;
+
     const { error } = await supabase.storage.from("product-images").upload(fileName, file);
     if (error) {
       toast.error("Upload failed: " + error.message);
       setUploading(false);
       return;
     }
+
     const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(fileName);
-    setEditProduct((prev: any) => ({ ...prev, image_url: urlData.publicUrl }));
-    setUploading(false);
+    const uploadedUrl = urlData.publicUrl;
+    const currentProductId = editProduct?.id;
+
+    setEditProduct((prev: any) => ({ ...prev, image_url: uploadedUrl }));
+
+    // For existing products, persist image immediately so users don't need an extra save click.
+    if (currentProductId) {
+      const { error: updateError } = await supabase
+        .from("products")
+        .update({ image_url: uploadedUrl })
+        .eq("id", currentProductId);
+
+      if (updateError) {
+        toast.error("Image uploaded but failed to save product image URL");
+        setUploading(false);
+        return;
+      }
+
+      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+      toast.success("Image uploaded and saved");
+      setUploading(false);
+      return;
+    }
+
     toast.success("Image uploaded");
+    setUploading(false);
   };
 
   const { data: products, isLoading } = useQuery({
@@ -101,6 +127,11 @@ const AdminProducts = () => {
   };
 
   const handleSave = () => {
+    if (uploading) {
+      toast.error("Please wait for the image upload to finish");
+      return;
+    }
+
     const payload: any = {
       name: editProduct.name,
       slug: editProduct.slug,
@@ -248,8 +279,8 @@ const AdminProducts = () => {
                   Featured
                 </label>
               </div>
-              <Button onClick={handleSave} disabled={saveMutation.isPending} className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-5">
-                {saveMutation.isPending ? "Saving..." : "Save Product"}
+              <Button onClick={handleSave} disabled={saveMutation.isPending || uploading} className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-5">
+                {uploading ? "Uploading image..." : saveMutation.isPending ? "Saving..." : "Save Product"}
               </Button>
             </div>
           )}

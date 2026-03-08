@@ -189,8 +189,39 @@ const AdminProducts = () => {
                 </Select>
               </div>
               <div>
-                <label className="font-body text-xs tracking-wider uppercase block mb-1">Image URL</label>
-                <Input value={editProduct.image_url || ""} onChange={(e) => setEditProduct({ ...editProduct, image_url: e.target.value })} />
+                <label className="font-body text-xs tracking-wider uppercase block mb-1">Product Image</label>
+                {editProduct.image_url && (
+                  <img src={editProduct.image_url} alt="Preview" className="w-20 h-20 object-cover rounded mb-2 border border-border" />
+                )}
+                <div className="flex gap-2">
+                  <Input
+                    value={editProduct.image_url || ""}
+                    onChange={(e) => setEditProduct({ ...editProduct, image_url: e.target.value })}
+                    placeholder="Image URL or upload"
+                    className="flex-1"
+                  />
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleImageUpload(file);
+                      e.target.value = "";
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    disabled={uploading}
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Max 3MB per image</p>
               </div>
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 font-body text-sm">

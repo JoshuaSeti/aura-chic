@@ -23,6 +23,7 @@ const AdminProducts = () => {
   const [editProduct, setEditProduct] = useState<any>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [newColor, setNewColor] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = async (file: File) => {

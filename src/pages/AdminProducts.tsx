@@ -275,6 +275,84 @@ const AdminProducts = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">Max 3MB per image</p>
               </div>
+              {/* Sizes */}
+              <div>
+                <label className="font-body text-xs tracking-wider uppercase block mb-2">Sizes</label>
+                <div className="flex flex-wrap gap-3">
+                  {COMMON_SIZES.map((size) => {
+                    const checked = (editProduct.sizes || []).includes(size);
+                    return (
+                      <label key={size} className="flex items-center gap-1.5 font-body text-sm cursor-pointer">
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(v) => {
+                            const current = editProduct.sizes || [];
+                            setEditProduct({
+                              ...editProduct,
+                              sizes: v ? [...current, size] : current.filter((s: string) => s !== size),
+                            });
+                          }}
+                        />
+                        {size}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* Colors */}
+              <div>
+                <label className="font-body text-xs tracking-wider uppercase block mb-2">Colors</label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {(editProduct.colors || []).map((color: string) => (
+                    <Badge key={color} variant="secondary" className="gap-1 font-body text-xs">
+                      {color}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setEditProduct({
+                            ...editProduct,
+                            colors: editProduct.colors.filter((c: string) => c !== color),
+                          })
+                        }
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={newColor}
+                    onChange={(e) => setNewColor(e.target.value)}
+                    placeholder="e.g. Black, Red, Navy"
+                    className="flex-1"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        const trimmed = newColor.trim();
+                        if (trimmed && !(editProduct.colors || []).includes(trimmed)) {
+                          setEditProduct({ ...editProduct, colors: [...(editProduct.colors || []), trimmed] });
+                          setNewColor("");
+                        }
+                      }
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const trimmed = newColor.trim();
+                      if (trimmed && !(editProduct.colors || []).includes(trimmed)) {
+                        setEditProduct({ ...editProduct, colors: [...(editProduct.colors || []), trimmed] });
+                        setNewColor("");
+                      }
+                    }}
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 font-body text-sm">
                   <Switch checked={editProduct.in_stock} onCheckedChange={(v) => setEditProduct({ ...editProduct, in_stock: v })} />

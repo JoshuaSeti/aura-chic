@@ -3,7 +3,7 @@ import { ShoppingBag, Menu, X, User, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
-import logo from "@/assets/logo.jpeg";
+import logo from "@/assets/logo.png";
 import type { Session } from "@supabase/supabase-js";
 
 const Navbar = () => {

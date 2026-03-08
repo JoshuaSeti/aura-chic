@@ -127,6 +127,11 @@ const AdminProducts = () => {
   };
 
   const handleSave = () => {
+    if (uploading) {
+      toast.error("Please wait for the image upload to finish");
+      return;
+    }
+
     const payload: any = {
       name: editProduct.name,
       slug: editProduct.slug,

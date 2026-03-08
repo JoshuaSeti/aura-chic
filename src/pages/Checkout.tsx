@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { getProductImage } from "@/lib/productImages";
+import { formatPrice } from "@/lib/utils";
 
 const Checkout = () => {
   const { items, total, clearCart } = useCart();

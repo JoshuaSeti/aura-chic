@@ -79,7 +79,7 @@ const AdminHero = () => {
     mutationFn: async () => {
       const { error } = await supabase
         .from("site_settings")
-        .update({ value: hero as unknown as Record<string, unknown>, updated_at: new Date().toISOString() })
+        .update({ value: hero as any, updated_at: new Date().toISOString() })
         .eq("key", "hero");
       if (error) throw error;
     },

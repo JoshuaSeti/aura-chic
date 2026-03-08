@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import { formatPrice } from "@/lib/utils";
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
 

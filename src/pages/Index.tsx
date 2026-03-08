@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
-import heroImage from "@/assets/hero-image.jpg";
+import heroImageFallback from "@/assets/hero-image.jpg";
 
 const Index = () => {
   const { data: featuredProducts } = useQuery({
@@ -21,6 +21,27 @@ const Index = () => {
     },
   });
 
+  const { data: heroSettings } = useQuery({
+    queryKey: ["site-settings", "hero"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("*")
+        .eq("key", "hero")
+        .single();
+      return data?.value as any;
+    },
+  });
+
+  const hero = {
+    subtitle: heroSettings?.subtitle || "New Collection 2026",
+    title: heroSettings?.title || "Elegance\nRedefined",
+    description: heroSettings?.description || "Discover curated luxury pieces that embody sophistication and timeless style.",
+    cta_text: heroSettings?.cta_text || "Shop Now",
+    cta_link: heroSettings?.cta_link || "/shop",
+    image_url: heroSettings?.image_url || heroImageFallback,
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -28,20 +49,20 @@ const Index = () => {
 
       {/* Hero */}
       <section className="relative h-[85vh] flex items-center overflow-hidden">
-        <img src={heroImage} alt="SosoFab Collection" className="absolute inset-0 w-full h-full object-cover" />
+        <img src={hero.image_url || heroImageFallback} alt="SosoFab Collection" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
         <div className="relative container mx-auto px-4">
           <div className="max-w-lg animate-fade-in">
-            <p className="font-body text-xs tracking-[0.3em] uppercase text-gold-light mb-4">New Collection 2026</p>
-            <h1 className="font-display text-5xl md:text-7xl font-light leading-tight text-card mb-6">
-              Elegance<br />Redefined
+            <p className="font-body text-xs tracking-[0.3em] uppercase text-gold-light mb-4">{hero.subtitle}</p>
+            <h1 className="font-display text-5xl md:text-7xl font-light leading-tight text-card mb-6 whitespace-pre-line">
+              {hero.title}
             </h1>
             <p className="font-body text-sm text-card/80 mb-8 leading-relaxed max-w-sm">
-              Discover curated luxury pieces that embody sophistication and timeless style.
+              {hero.description}
             </p>
-            <Link to="/shop">
+            <Link to={hero.cta_link}>
               <Button className="bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs px-8 py-6 hover:bg-primary/90">
-                Shop Now
+                {hero.cta_text}
               </Button>
             </Link>
           </div>

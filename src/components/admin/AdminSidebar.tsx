@@ -1,4 +1,4 @@
-import { Package, ShoppingCart, Tags, LogOut, Home } from "lucide-react";
+import { Package, ShoppingCart, Tags, LogOut, Home, Image } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +20,7 @@ const items = [
   { title: "Products", url: "/admin", icon: Package },
   { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
   { title: "Categories", url: "/admin/categories", icon: Tags },
+  { title: "Hero", url: "/admin/hero", icon: Image },
 ];
 
 const AdminSidebar = () => {

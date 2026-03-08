@@ -89,7 +89,7 @@ const Checkout = () => {
               disabled={loading}
               className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-6 hover:bg-primary/90"
             >
-              {loading ? "Placing Order..." : `Place Order — $${total.toFixed(2)}`}
+              {loading ? "Placing Order..." : `Place Order — ${formatPrice(total)}`}
             </Button>
           </form>
 

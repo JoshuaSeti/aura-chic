@@ -15,8 +15,11 @@ import { useWishlist } from "@/hooks/useWishlist";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const { addItem } = useCart();
+  const { isInWishlist, toggleWishlist, isAuthenticated } = useWishlist();
   const [selectedSize, setSelectedSize] = useState<string>();
+  const [selectedColor, setSelectedColor] = useState<string>();
   const [selectedColor, setSelectedColor] = useState<string>();
 
   const { data: product, isLoading } = useQuery({

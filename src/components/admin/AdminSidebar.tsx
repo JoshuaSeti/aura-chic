@@ -20,6 +20,7 @@ const items = [
   { title: "Products", url: "/admin", icon: Package },
   { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
   { title: "Categories", url: "/admin/categories", icon: Tags },
+  { title: "Hero", url: "/admin/hero", icon: Image },
 ];
 
 const AdminSidebar = () => {

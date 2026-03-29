@@ -91,8 +91,26 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Banner */}
+      {/* Services Preview */}
       <section className="bg-linen py-20">
+        <div className="container mx-auto px-4 text-center max-w-2xl">
+          <p className="font-body text-xs tracking-[0.3em] uppercase text-primary mb-2">Beyond Fashion</p>
+          <h2 className="font-display text-3xl md:text-4xl font-light mb-6 leading-snug">
+            Our Services
+          </h2>
+          <p className="font-body text-sm text-muted-foreground leading-relaxed mb-8">
+            From personal styling to expert consultations, we offer curated services designed to elevate your lifestyle.
+          </p>
+          <Link to="/services">
+            <Button variant="outline" className="font-body tracking-widest uppercase text-xs px-8 py-6 border-foreground text-foreground hover:bg-foreground hover:text-background">
+              Explore Services
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Banner */}
+      <section className="py-20">
         <div className="container mx-auto px-4 text-center max-w-2xl">
           <p className="font-body text-xs tracking-[0.3em] uppercase text-primary mb-4">Our Philosophy</p>
           <h2 className="font-display text-3xl md:text-4xl font-light mb-6 leading-snug">

@@ -1,4 +1,4 @@
-import { Package, ShoppingCart, Tags, LogOut, Home, Image, Users } from "lucide-react";
+import { Package, ShoppingCart, Tags, LogOut, Home, Image, Users, Briefcase, CalendarCheck } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,6 +21,8 @@ const items = [
   { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
   { title: "Categories", url: "/admin/categories", icon: Tags },
   { title: "Hero", url: "/admin/hero", icon: Image },
+  { title: "Services", url: "/admin/services", icon: Briefcase },
+  { title: "Bookings", url: "/admin/bookings", icon: CalendarCheck },
   { title: "Admins", url: "/admin/users", icon: Users },
 ];
 

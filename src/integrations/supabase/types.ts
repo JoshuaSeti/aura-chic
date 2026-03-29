@@ -315,11 +315,17 @@ export type Database = {
       services: {
         Row: {
           active: boolean
+          available_days: string[] | null
+          available_end_time: string | null
+          available_start_time: string | null
           created_at: string
           description: string | null
           duration_minutes: number
           id: string
           image_url: string | null
+          is_limited_time: boolean | null
+          limited_time_end: string | null
+          limited_time_start: string | null
           name: string
           price: number
           slug: string
@@ -327,11 +333,17 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          available_days?: string[] | null
+          available_end_time?: string | null
+          available_start_time?: string | null
           created_at?: string
           description?: string | null
           duration_minutes?: number
           id?: string
           image_url?: string | null
+          is_limited_time?: boolean | null
+          limited_time_end?: string | null
+          limited_time_start?: string | null
           name: string
           price: number
           slug: string
@@ -339,11 +351,17 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          available_days?: string[] | null
+          available_end_time?: string | null
+          available_start_time?: string | null
           created_at?: string
           description?: string | null
           duration_minutes?: number
           id?: string
           image_url?: string | null
+          is_limited_time?: boolean | null
+          limited_time_end?: string | null
+          limited_time_start?: string | null
           name?: string
           price?: number
           slug?: string
@@ -433,7 +451,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      app_role: "admin" | "user" | "super_admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -561,7 +579,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      app_role: ["admin", "user", "super_admin"],
     },
   },
 } as const

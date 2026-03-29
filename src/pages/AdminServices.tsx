@@ -5,13 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/utils";
+import { format } from "date-fns";
 
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
+const DAYS_OF_WEEK = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 const AdminServices = () => {
   const queryClient = useQueryClient();
@@ -70,11 +74,40 @@ const AdminServices = () => {
   });
 
   const openNew = () => {
-    setEditService({ name: "", slug: "", description: "", price: 0, duration_minutes: 60, image_url: "", active: true });
+    setEditService({
+      name: "", slug: "", description: "", price: 0, duration_minutes: 60,
+      image_url: "", active: true,
+      available_days: [...DAYS_OF_WEEK],
+      available_start_time: "09:00",
+      available_end_time: "17:00",
+      is_limited_time: false,
+      limited_time_start: "",
+      limited_time_end: "",
+    });
     setDialogOpen(true);
   };
 
-  const openEdit = (s: any) => { setEditService({ ...s }); setDialogOpen(true); };
+  const openEdit = (s: any) => {
+    setEditService({
+      ...s,
+      available_days: s.available_days || [...DAYS_OF_WEEK],
+      available_start_time: s.available_start_time || "09:00",
+      available_end_time: s.available_end_time || "17:00",
+      is_limited_time: s.is_limited_time || false,
+      limited_time_start: s.limited_time_start ? s.limited_time_start.slice(0, 16) : "",
+      limited_time_end: s.limited_time_end ? s.limited_time_end.slice(0, 16) : "",
+    });
+    setDialogOpen(true);
+  };
+
+  const toggleDay = (day: string) => {
+    setEditService((prev: any) => ({
+      ...prev,
+      available_days: prev.available_days.includes(day)
+        ? prev.available_days.filter((d: string) => d !== day)
+        : [...prev.available_days, day],
+    }));
+  };
 
   const handleSave = () => {
     if (uploading) { toast.error("Wait for image upload"); return; }
@@ -86,6 +119,12 @@ const AdminServices = () => {
       duration_minutes: editService.duration_minutes,
       image_url: editService.image_url || null,
       active: editService.active,
+      available_days: editService.available_days,
+      available_start_time: editService.available_start_time,
+      available_end_time: editService.available_end_time,
+      is_limited_time: editService.is_limited_time,
+      limited_time_start: editService.is_limited_time && editService.limited_time_start ? new Date(editService.limited_time_start).toISOString() : null,
+      limited_time_end: editService.is_limited_time && editService.limited_time_end ? new Date(editService.limited_time_end).toISOString() : null,
     };
     if (editService.id) payload.id = editService.id;
     saveMutation.mutate(payload);
@@ -107,18 +146,27 @@ const AdminServices = () => {
               <TableHead className="font-body text-xs tracking-wider uppercase">Name</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Price</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Duration</TableHead>
+              <TableHead className="font-body text-xs tracking-wider uppercase">Availability</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Active</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase w-24">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={5} className="text-center font-body text-muted-foreground py-8">Loading...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center font-body text-muted-foreground py-8">Loading...</TableCell></TableRow>
             ) : services?.map((s: any) => (
               <TableRow key={s.id}>
                 <TableCell className="font-body text-sm">{s.name}</TableCell>
                 <TableCell className="font-body text-sm">{formatPrice(s.price)}</TableCell>
                 <TableCell className="font-body text-sm">{s.duration_minutes} min</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {s.is_limited_time && <Badge variant="outline" className="text-xs">Limited Time</Badge>}
+                    <span className="font-body text-xs text-muted-foreground">
+                      {(s.available_days || []).length === 7 ? "Every day" : `${(s.available_days || []).length} days`}
+                    </span>
+                  </div>
+                </TableCell>
                 <TableCell><span className={`font-body text-xs ${s.active ? "text-green-600" : "text-destructive"}`}>{s.active ? "Yes" : "No"}</span></TableCell>
                 <TableCell>
                   <div className="flex gap-1">
@@ -161,6 +209,56 @@ const AdminServices = () => {
                   <Input type="number" value={editService.duration_minutes} onChange={(e) => setEditService({ ...editService, duration_minutes: parseInt(e.target.value) || 60 })} />
                 </div>
               </div>
+
+              {/* Availability Section */}
+              <div className="border border-border rounded-lg p-4 space-y-4">
+                <h3 className="font-body text-xs tracking-wider uppercase font-semibold">Availability</h3>
+                
+                <div>
+                  <label className="font-body text-xs tracking-wider uppercase block mb-2">Available Days</label>
+                  <div className="flex flex-wrap gap-2">
+                    {DAYS_OF_WEEK.map((day) => (
+                      <label key={day} className="flex items-center gap-1.5 cursor-pointer">
+                        <Checkbox
+                          checked={editService.available_days?.includes(day)}
+                          onCheckedChange={() => toggleDay(day)}
+                        />
+                        <span className="font-body text-xs">{day.slice(0, 3)}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="font-body text-xs tracking-wider uppercase block mb-1">Start Time</label>
+                    <Input type="time" value={editService.available_start_time} onChange={(e) => setEditService({ ...editService, available_start_time: e.target.value })} />
+                  </div>
+                  <div>
+                    <label className="font-body text-xs tracking-wider uppercase block mb-1">End Time</label>
+                    <Input type="time" value={editService.available_end_time} onChange={(e) => setEditService({ ...editService, available_end_time: e.target.value })} />
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-2 font-body text-sm cursor-pointer">
+                  <Switch checked={editService.is_limited_time} onCheckedChange={(v) => setEditService({ ...editService, is_limited_time: v })} />
+                  Limited-time service
+                </label>
+
+                {editService.is_limited_time && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="font-body text-xs tracking-wider uppercase block mb-1">Available From</label>
+                      <Input type="datetime-local" value={editService.limited_time_start} onChange={(e) => setEditService({ ...editService, limited_time_start: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className="font-body text-xs tracking-wider uppercase block mb-1">Available Until</label>
+                      <Input type="datetime-local" value={editService.limited_time_end} onChange={(e) => setEditService({ ...editService, limited_time_end: e.target.value })} />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className="font-body text-xs tracking-wider uppercase block mb-1">Service Image</label>
                 {editService.image_url && (

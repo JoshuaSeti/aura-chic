@@ -24,16 +24,6 @@ const AdminLogin = () => {
     setLoading(false);
   };
 
-  const handleSignUp = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
-    if (error) {
-      toast.error(error.message);
-    } else {
-      toast.success("Account created! You can now sign in.");
-    }
-    setLoading(false);
-  };
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
@@ -67,15 +57,6 @@ const AdminLogin = () => {
             className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-5 hover:bg-primary/90"
           >
             {loading ? "Signing in..." : "Sign In"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleSignUp}
-            disabled={loading}
-            className="w-full font-body tracking-widest uppercase text-xs py-5"
-          >
-            Create Account
           </Button>
         </form>
       </div>

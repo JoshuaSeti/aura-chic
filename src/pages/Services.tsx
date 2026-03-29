@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/Navbar";
@@ -11,17 +11,27 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { CalendarIcon, Clock, MessageCircle } from "lucide-react";
-import { format } from "date-fns";
+import { format, getDay } from "date-fns";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/lib/utils";
 import { toast } from "sonner";
 
-const TIME_SLOTS = [
-  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "13:00", "13:30", "14:00", "14:30",
-  "15:00", "15:30", "16:00", "16:30", "17:00",
-];
+const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+const generateTimeSlots = (start: string, end: string): string[] => {
+  const slots: string[] = [];
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  let h = sh, m = sm;
+  while (h < eh || (h === eh && m <= em)) {
+    slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
+    m += 30;
+    if (m >= 60) { h++; m = 0; }
+  }
+  return slots;
+};
 
 const Services = () => {
   const [bookingService, setBookingService] = useState<any>(null);
@@ -44,6 +54,33 @@ const Services = () => {
       return data || [];
     },
   });
+
+  // Filter out expired limited-time services
+  const activeServices = useMemo(() => {
+    const now = new Date();
+    return (services || []).filter((s: any) => {
+      if (!s.is_limited_time) return true;
+      if (s.limited_time_start && new Date(s.limited_time_start) > now) return false;
+      if (s.limited_time_end && new Date(s.limited_time_end) < now) return false;
+      return true;
+    });
+  }, [services]);
+
+  const timeSlots = useMemo(() => {
+    if (!bookingService) return [];
+    return generateTimeSlots(
+      bookingService.available_start_time || "09:00",
+      bookingService.available_end_time || "17:00"
+    );
+  }, [bookingService]);
+
+  const isDateDisabled = (date: Date) => {
+    if (date < new Date(new Date().setHours(0, 0, 0, 0))) return true;
+    if (!bookingService) return false;
+    const dayName = DAY_NAMES[getDay(date)];
+    const availDays: string[] = bookingService.available_days || DAY_NAMES;
+    return !availDays.includes(dayName);
+  };
 
   const handleBook = async () => {
     if (!bookingDate || !bookingTime || !customerName || !customerEmail) {
@@ -99,11 +136,11 @@ const Services = () => {
         <div className="container mx-auto px-4">
           {isLoading ? (
             <p className="text-center font-body text-muted-foreground">Loading services...</p>
-          ) : services?.length === 0 ? (
+          ) : activeServices.length === 0 ? (
             <p className="text-center font-body text-muted-foreground">No services available at the moment.</p>
           ) : (
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {services?.map((service: any) => (
+              {activeServices.map((service: any) => (
                 <div key={service.id} className="bg-card border border-border rounded-lg overflow-hidden group">
                   {service.image_url ? (
                     <div className="aspect-[4/3] overflow-hidden">
@@ -123,15 +160,18 @@ const Services = () => {
                     {service.description && (
                       <p className="font-body text-sm text-muted-foreground mb-4 line-clamp-3">{service.description}</p>
                     )}
-                    <div className="flex items-center gap-4 mb-4">
+                    <div className="flex items-center gap-4 mb-2">
                       <span className="font-body text-lg font-semibold">{formatPrice(service.price)}</span>
                       <span className="font-body text-xs text-muted-foreground flex items-center gap-1">
                         <Clock className="h-3 w-3" /> {service.duration_minutes} min
                       </span>
                     </div>
+                    {service.is_limited_time && (
+                      <Badge variant="outline" className="mb-3 text-xs">Limited Time Offer</Badge>
+                    )}
                     <div className="flex gap-2">
                       <Button
-                        onClick={() => setBookingService(service)}
+                        onClick={() => { setBookingService(service); setBookingDate(undefined); setBookingTime(""); }}
                         className="flex-1 bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-5 hover:bg-primary/90"
                       >
                         Book Now
@@ -186,7 +226,7 @@ const Services = () => {
                     mode="single"
                     selected={bookingDate}
                     onSelect={setBookingDate}
-                    disabled={(date) => date < new Date()}
+                    disabled={isDateDisabled}
                     className={cn("p-3 pointer-events-auto")}
                   />
                 </PopoverContent>
@@ -199,7 +239,7 @@ const Services = () => {
                   <SelectValue placeholder="Select a time" />
                 </SelectTrigger>
                 <SelectContent>
-                  {TIME_SLOTS.map((t) => (
+                  {timeSlots.map((t) => (
                     <SelectItem key={t} value={t}>{t}</SelectItem>
                   ))}
                 </SelectContent>

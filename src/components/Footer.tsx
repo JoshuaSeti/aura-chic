@@ -36,7 +36,7 @@ const Footer = () => {
           <div>
             <img src={logo} alt="SosoFab Lifestyle" className="h-12 mb-4 brightness-150" />
             <p className="font-body text-sm text-secondary-foreground/70 leading-relaxed">
-              Curated luxury fashion for the modern woman. Elegance redefined.
+              Premier luxury beauty studio & boutique in Port Elizabeth, South Africa. Redefining elegance and sophistication since 2006.
             </p>
           </div>
           <div>
@@ -53,7 +53,7 @@ const Footer = () => {
             <ul className="space-y-2 font-body text-sm text-secondary-foreground/70">
               <li><Link to="/about" className="hover:text-gold-light transition-colors">About Us</Link></li>
               <li><Link to="/services" className="hover:text-gold-light transition-colors">Services</Link></li>
-              <li><a href="#" className="hover:text-gold-light transition-colors">Contact</a></li>
+              <li><a href="mailto:Sosofablifestyle@gmail.com" className="hover:text-gold-light transition-colors">Contact</a></li>
             </ul>
           </div>
           {activePolicies.length > 0 && (

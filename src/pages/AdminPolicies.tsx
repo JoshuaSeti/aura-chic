@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -17,6 +18,7 @@ const POLICIES = [
 interface PolicyData {
   title: string;
   content: string;
+  visible?: boolean;
 }
 
 const AdminPolicies = () => {
@@ -87,6 +89,13 @@ const AdminPolicies = () => {
         {POLICIES.map((p) => (
           <TabsContent key={p.key} value={p.key}>
             <div className="bg-card rounded border border-border p-6 space-y-4 max-w-3xl">
+              <div className="flex items-center justify-between">
+                <label className="font-body text-xs tracking-wider uppercase">Page Visible</label>
+                <Switch
+                  checked={editData[p.key]?.visible !== false}
+                  onCheckedChange={(checked) => updateField(p.key, "visible", checked as any)}
+                />
+              </div>
               <div>
                 <label className="font-body text-xs tracking-wider uppercase block mb-1">Page Title</label>
                 <Input

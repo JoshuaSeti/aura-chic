@@ -9,10 +9,9 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 const POLICIES = [
-  { key: "terms_and_conditions", label: "Terms & Conditions" },
-  { key: "return_policy", label: "Return Policy" },
-  { key: "privacy_policy", label: "Privacy Policy" },
-  { key: "shipping_policy", label: "Shipping Policy" },
+  { key: "shipping_policy", label: "Shipping & Collection" },
+  { key: "booking_policy", label: "Booking Policy" },
+  { key: "trading_hours", label: "Trading Hours & Info" },
 ];
 
 interface PolicyData {

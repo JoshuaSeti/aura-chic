@@ -22,6 +22,8 @@ import AdminUsers from "./pages/AdminUsers";
 import AdminServices from "./pages/AdminServices";
 import AdminBookings from "./pages/AdminBookings";
 import Services from "./pages/Services";
+import PolicyPage from "./pages/PolicyPage";
+import AdminPolicies from "./pages/AdminPolicies";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +41,7 @@ const App = () => (
             <Route path="/product/:slug" element={<ProductDetail />} />
             <Route path="/about" element={<About />} />
             <Route path="/services" element={<Services />} />
+            <Route path="/policy/:slug" element={<PolicyPage />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/account" element={<Account />} />
@@ -52,6 +55,7 @@ const App = () => (
               <Route path="users" element={<AdminUsers />} />
               <Route path="services" element={<AdminServices />} />
               <Route path="bookings" element={<AdminBookings />} />
+              <Route path="policies" element={<AdminPolicies />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

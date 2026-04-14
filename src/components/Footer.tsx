@@ -24,16 +24,17 @@ const Footer = () => (
           <h4 className="font-display text-lg mb-4">Company</h4>
           <ul className="space-y-2 font-body text-sm text-secondary-foreground/70">
             <li><Link to="/about" className="hover:text-gold-light transition-colors">About Us</Link></li>
+            <li><Link to="/services" className="hover:text-gold-light transition-colors">Services</Link></li>
             <li><a href="#" className="hover:text-gold-light transition-colors">Contact</a></li>
-            <li><a href="#" className="hover:text-gold-light transition-colors">Shipping</a></li>
           </ul>
         </div>
         <div>
-          <h4 className="font-display text-lg mb-4">Connect</h4>
+          <h4 className="font-display text-lg mb-4">Policies</h4>
           <ul className="space-y-2 font-body text-sm text-secondary-foreground/70">
-            <li><a href="#" className="hover:text-gold-light transition-colors">Instagram</a></li>
-            <li><a href="#" className="hover:text-gold-light transition-colors">Facebook</a></li>
-            <li><a href="#" className="hover:text-gold-light transition-colors">Pinterest</a></li>
+            <li><Link to="/policy/terms-and-conditions" className="hover:text-gold-light transition-colors">Terms & Conditions</Link></li>
+            <li><Link to="/policy/return-policy" className="hover:text-gold-light transition-colors">Return Policy</Link></li>
+            <li><Link to="/policy/privacy-policy" className="hover:text-gold-light transition-colors">Privacy Policy</Link></li>
+            <li><Link to="/policy/shipping-policy" className="hover:text-gold-light transition-colors">Shipping Policy</Link></li>
           </ul>
         </div>
       </div>

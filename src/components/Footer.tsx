@@ -5,6 +5,7 @@ import logo from "@/assets/logo.png";
 
 const POLICY_LINKS = [
   { key: "shipping_policy", slug: "shipping-policy", label: "Shipping & Collection" },
+  { key: "returns_policy", slug: "returns-and-exchanges", label: "Returns & Exchanges" },
   { key: "booking_policy", slug: "booking-policy", label: "Booking Policy" },
   { key: "trading_hours", slug: "trading-hours", label: "Trading Hours & Info" },
 ];

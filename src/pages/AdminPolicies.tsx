@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 const POLICIES = [
   { key: "shipping_policy", label: "Shipping & Collection" },
+  { key: "returns_policy", label: "Returns & Exchanges" },
   { key: "booking_policy", label: "Booking Policy" },
   { key: "trading_hours", label: "Trading Hours & Info" },
 ];

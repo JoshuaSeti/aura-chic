@@ -7,6 +7,7 @@ import CartDrawer from "@/components/CartDrawer";
 
 const POLICY_KEYS: Record<string, string> = {
   "shipping-policy": "shipping_policy",
+  "returns-and-exchanges": "returns_policy",
   "booking-policy": "booking_policy",
   "trading-hours": "trading_hours",
 };

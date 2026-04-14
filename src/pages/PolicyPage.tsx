@@ -29,7 +29,9 @@ const PolicyPage = () => {
     enabled: !!settingsKey,
   });
 
-  if (!settingsKey) {
+  const notFound = !settingsKey || (!isLoading && (!data || data?.visible === false));
+
+  if (notFound) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />

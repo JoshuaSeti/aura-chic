@@ -6,10 +6,9 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 
 const POLICY_KEYS: Record<string, string> = {
-  "terms-and-conditions": "terms_and_conditions",
-  "return-policy": "return_policy",
-  "privacy-policy": "privacy_policy",
   "shipping-policy": "shipping_policy",
+  "booking-policy": "booking_policy",
+  "trading-hours": "trading_hours",
 };
 
 const PolicyPage = () => {

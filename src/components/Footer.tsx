@@ -4,10 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/logo.png";
 
 const POLICY_LINKS = [
-  { key: "terms_and_conditions", slug: "terms-and-conditions", label: "Terms & Conditions" },
-  { key: "return_policy", slug: "return-policy", label: "Return Policy" },
-  { key: "privacy_policy", slug: "privacy-policy", label: "Privacy Policy" },
-  { key: "shipping_policy", slug: "shipping-policy", label: "Shipping Policy" },
+  { key: "shipping_policy", slug: "shipping-policy", label: "Shipping & Collection" },
+  { key: "booking_policy", slug: "booking-policy", label: "Booking Policy" },
+  { key: "trading_hours", slug: "trading-hours", label: "Trading Hours & Info" },
 ];
 
 const Footer = () => {

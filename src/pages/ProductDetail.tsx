@@ -20,6 +20,7 @@ const ProductDetail = () => {
   const { isInWishlist, toggleWishlist, isAuthenticated } = useWishlist();
   const [selectedSize, setSelectedSize] = useState<string>();
   const [selectedColor, setSelectedColor] = useState<string>();
+  const [selectedImage, setSelectedImage] = useState<string>();
 
   const { data: product, isLoading } = useQuery({
     queryKey: ["product", slug],
@@ -55,14 +56,15 @@ const ProductDetail = () => {
   }
 
   const colorImages = (product.color_images || {}) as Record<string, string>;
+  const primaryImage = getPrimaryProductImage({ slug: product.slug, imageUrl: product.image_url, images: product.images, colorImages, selectedColor });
   const galleryImages = Array.from(
     new Set([
-      getPrimaryProductImage({ slug: product.slug, imageUrl: product.image_url, images: product.images, colorImages, selectedColor }),
+      primaryImage,
       ...(product.images || []),
       ...Object.values(colorImages),
     ].filter(Boolean))
   );
-  const image = galleryImages[0];
+  const image = selectedImage || primaryImage;
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
   const sizes = product.sizes?.filter((s) => s.length > 0) || [];
   const colors = product.colors?.filter((c) => c.length > 0) || [];
@@ -95,6 +97,7 @@ const ProductDetail = () => {
                     key={galleryImage}
                     type="button"
                     onClick={() => {
+                      setSelectedImage(galleryImage);
                       const matchingColor = Object.entries(colorImages).find(([, url]) => url === galleryImage)?.[0];
                       if (matchingColor) setSelectedColor(matchingColor);
                     }}
@@ -155,7 +158,10 @@ const ProductDetail = () => {
                   {colors.map((color) => (
                     <button
                       key={color}
-                      onClick={() => setSelectedColor(color)}
+                      onClick={() => {
+                        setSelectedColor(color);
+                        if (colorImages[color]) setSelectedImage(colorImages[color]);
+                      }}
                       className={`font-body text-xs px-4 py-2 border rounded transition-colors ${
                         selectedColor === color
                           ? "bg-foreground text-background border-foreground"

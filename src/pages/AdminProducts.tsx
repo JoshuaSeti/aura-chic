@@ -9,14 +9,13 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2, Upload, X } from "lucide-react";
+import { Plus, Pencil, Trash2, Upload, X, Star } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/utils";
 
 const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
-
-const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+const MAX_FILE_SIZE = 3 * 1024 * 1024;
 
 const AdminProducts = () => {
   const queryClient = useQueryClient();
@@ -25,55 +24,109 @@ const AdminProducts = () => {
   const [uploading, setUploading] = useState(false);
   const [newColor, setNewColor] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageUpload = async (file: File) => {
+  const validateImage = (file: File) => {
     if (file.size > MAX_FILE_SIZE) {
-      toast.error("Image must be under 3MB");
-      return;
+      toast.error(`${file.name} must be under 3MB`);
+      return false;
     }
     if (!file.type.startsWith("image/")) {
-      toast.error("File must be an image");
-      return;
+      toast.error(`${file.name} must be an image`);
+      return false;
     }
+    return true;
+  };
 
-    setUploading(true);
+  const uploadProductImage = async (file: File) => {
     const ext = file.name.split(".").pop();
-    const fileName = `${crypto.randomUUID()}.${ext}`;
-
+    const fileName = `products/${crypto.randomUUID()}.${ext}`;
     const { error } = await supabase.storage.from("product-images").upload(fileName, file);
-    if (error) {
-      toast.error("Upload failed: " + error.message);
-      setUploading(false);
-      return;
-    }
+    if (error) throw error;
 
     const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(fileName);
-    const uploadedUrl = urlData.publicUrl;
-    const currentProductId = editProduct?.id;
+    return urlData.publicUrl;
+  };
 
-    setEditProduct((prev: any) => ({ ...prev, image_url: uploadedUrl }));
+  const persistProductImages = async (updates: Record<string, any>) => {
+    if (!editProduct?.id) return;
 
-    // For existing products, persist image immediately so users don't need an extra save click.
-    if (currentProductId) {
-      const { error: updateError } = await supabase
-        .from("products")
-        .update({ image_url: uploadedUrl })
-        .eq("id", currentProductId);
+    const { error } = await supabase
+      .from("products")
+      .update(updates)
+      .eq("id", editProduct.id);
 
-      if (updateError) {
-        toast.error("Image uploaded but failed to save product image URL");
-        setUploading(false);
-        return;
+    if (error) throw error;
+    queryClient.invalidateQueries({ queryKey: ["admin-products"] });
+  };
+
+  const handleImageUpload = async (files: FileList | File[], mode: "main" | "gallery" | "color", color?: string) => {
+    const validFiles = Array.from(files).filter(validateImage);
+    if (!validFiles.length) return;
+
+    setUploading(true);
+    try {
+      const uploadedUrls = [];
+      for (const file of validFiles) {
+        uploadedUrls.push(await uploadProductImage(file));
       }
 
-      queryClient.invalidateQueries({ queryKey: ["admin-products"] });
-      toast.success("Image uploaded and saved");
-      setUploading(false);
-      return;
-    }
+      const currentImages = editProduct.images || [];
+      const nextImages = Array.from(new Set([...currentImages, ...uploadedUrls]));
+      let updates: Record<string, any> = { images: nextImages };
 
-    toast.success("Image uploaded");
-    setUploading(false);
+      setEditProduct((prev: any) => {
+        if (!prev) return prev;
+
+        if (mode === "color" && color) {
+          const nextColorImages = { ...(prev.color_images || {}), [color]: uploadedUrls[0] };
+          updates = { ...updates, color_images: nextColorImages };
+          return {
+            ...prev,
+            images: nextImages,
+            color_images: nextColorImages,
+            image_url: prev.image_url || uploadedUrls[0],
+          };
+        }
+
+        if (mode === "gallery") {
+          return {
+            ...prev,
+            images: nextImages,
+            image_url: prev.image_url || uploadedUrls[0],
+          };
+        }
+
+        updates = { ...updates, image_url: uploadedUrls[0] };
+        return {
+          ...prev,
+          image_url: uploadedUrls[0],
+          images: nextImages,
+        };
+      });
+
+      if (editProduct?.id) {
+        await persistProductImages(updates);
+        toast.success("Images uploaded and saved");
+      } else {
+        toast.success("Images uploaded");
+      }
+    } catch (error: any) {
+      toast.error("Upload failed: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeImage = (url: string) => {
+    setEditProduct((prev: any) => {
+      const nextImages = (prev.images || []).filter((image: string) => image !== url);
+      const nextColorImages = Object.fromEntries(
+        Object.entries(prev.color_images || {}).filter(([, imageUrl]) => imageUrl !== url)
+      );
+      const nextImageUrl = prev.image_url === url ? nextImages[0] || "" : prev.image_url;
+      return { ...prev, images: nextImages, color_images: nextColorImages, image_url: nextImageUrl };
+    });
   };
 
   const { data: products, isLoading } = useQuery({
@@ -123,12 +176,12 @@ const AdminProducts = () => {
   });
 
   const openNew = () => {
-    setEditProduct({ name: "", slug: "", description: "", price: 0, compare_at_price: null, category_id: null, image_url: "", in_stock: true, featured: false, sizes: [], colors: [] });
+    setEditProduct({ name: "", slug: "", description: "", price: 0, compare_at_price: null, category_id: null, image_url: "", images: [], color_images: {}, in_stock: true, featured: false, sizes: [], colors: [] });
     setDialogOpen(true);
   };
 
   const openEdit = (p: any) => {
-    setEditProduct({ ...p, category_id: p.category_id || null });
+    setEditProduct({ ...p, category_id: p.category_id || null, images: p.images || [], color_images: p.color_images || {} });
     setDialogOpen(true);
   };
 
@@ -145,7 +198,9 @@ const AdminProducts = () => {
       price: editProduct.price,
       compare_at_price: editProduct.compare_at_price || null,
       category_id: editProduct.category_id || null,
-      image_url: editProduct.image_url || null,
+      image_url: editProduct.image_url || (editProduct.images || [])[0] || null,
+      images: editProduct.images || [],
+      color_images: editProduct.color_images || {},
       in_stock: editProduct.in_stock,
       featured: editProduct.featured,
       sizes: editProduct.sizes || [],
@@ -186,7 +241,7 @@ const AdminProducts = () => {
                 <TableCell className="font-body text-sm">{p.name}</TableCell>
                 <TableCell className="font-body text-sm text-muted-foreground">{p.categories?.name || "—"}</TableCell>
                 <TableCell className="font-body text-sm">{formatPrice(p.price)}</TableCell>
-                <TableCell><span className={`font-body text-xs ${p.in_stock ? "text-green-600" : "text-destructive"}`}>{p.in_stock ? "In Stock" : "Out"}</span></TableCell>
+                <TableCell><span className={`font-body text-xs ${p.in_stock ? "text-primary" : "text-destructive"}`}>{p.in_stock ? "In Stock" : "Out"}</span></TableCell>
                 <TableCell><span className={`font-body text-xs ${p.featured ? "text-primary" : "text-muted-foreground"}`}>{p.featured ? "Yes" : "No"}</span></TableCell>
                 <TableCell>
                   <div className="flex gap-1">
@@ -201,7 +256,7 @@ const AdminProducts = () => {
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-display text-xl">{editProduct?.id ? "Edit Product" : "New Product"}</DialogTitle>
           </DialogHeader>
@@ -240,42 +295,75 @@ const AdminProducts = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <label className="font-body text-xs tracking-wider uppercase block mb-1">Product Image</label>
-                {editProduct.image_url && (
-                  <img src={editProduct.image_url} alt="Preview" className="w-20 h-20 object-cover rounded mb-2 border border-border" />
-                )}
-                <div className="flex gap-2">
-                  <Input
-                    value={editProduct.image_url || ""}
-                    onChange={(e) => setEditProduct({ ...editProduct, image_url: e.target.value })}
-                    placeholder="Image URL or upload"
-                    className="flex-1"
-                  />
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleImageUpload(file);
-                      e.target.value = "";
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="icon"
-                    disabled={uploading}
-                    onClick={() => fileInputRef.current?.click()}
-                  >
-                    <Upload className="h-4 w-4" />
-                  </Button>
+
+              <div className="space-y-3 rounded border border-border p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <label className="font-body text-xs tracking-wider uppercase block">Product Images</label>
+                    <p className="text-xs text-muted-foreground mt-1">Upload one main image or multiple gallery images. Max 3MB each.</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files) handleImageUpload(files, "main");
+                        e.target.value = "";
+                      }}
+                    />
+                    <input
+                      ref={galleryInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const files = e.target.files;
+                        if (files) handleImageUpload(files, "gallery");
+                        e.target.value = "";
+                      }}
+                    />
+                    <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => fileInputRef.current?.click()}>
+                      <Star className="mr-2 h-4 w-4" /> Main
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" disabled={uploading} onClick={() => galleryInputRef.current?.click()}>
+                      <Upload className="mr-2 h-4 w-4" /> Gallery
+                    </Button>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">Max 3MB per image</p>
+                <Input
+                  value={editProduct.image_url || ""}
+                  onChange={(e) => setEditProduct({ ...editProduct, image_url: e.target.value })}
+                  placeholder="Main image URL or upload"
+                />
+                {(editProduct.images || []).length > 0 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+                    {(editProduct.images || []).map((image: string) => (
+                      <div key={image} className="relative rounded border border-border overflow-hidden bg-linen aspect-square">
+                        <img src={image} alt="Product upload preview" className="h-full w-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => setEditProduct({ ...editProduct, image_url: image })}
+                          className={`absolute left-1 top-1 rounded bg-background/80 px-1.5 py-0.5 font-body text-[10px] ${editProduct.image_url === image ? "text-primary" : "text-foreground"}`}
+                        >
+                          Main
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(image)}
+                          className="absolute right-1 top-1 rounded-full bg-background/80 p-1 text-destructive"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              {/* Sizes */}
+
               <div>
                 <label className="font-body text-xs tracking-wider uppercase block mb-2">Sizes</label>
                 <div className="flex flex-wrap gap-3">
@@ -299,10 +387,10 @@ const AdminProducts = () => {
                   })}
                 </div>
               </div>
-              {/* Colors */}
-              <div>
-                <label className="font-body text-xs tracking-wider uppercase block mb-2">Colors</label>
-                <div className="flex flex-wrap gap-1.5 mb-2">
+
+              <div className="space-y-3">
+                <label className="font-body text-xs tracking-wider uppercase block">Colors</label>
+                <div className="flex flex-wrap gap-1.5">
                   {(editProduct.colors || []).map((color: string) => (
                     <Badge key={color} variant="secondary" className="gap-1 font-body text-xs">
                       {color}
@@ -312,6 +400,7 @@ const AdminProducts = () => {
                           setEditProduct({
                             ...editProduct,
                             colors: editProduct.colors.filter((c: string) => c !== color),
+                            color_images: Object.fromEntries(Object.entries(editProduct.color_images || {}).filter(([key]) => key !== color)),
                           })
                         }
                       >
@@ -352,7 +441,46 @@ const AdminProducts = () => {
                     Add
                   </Button>
                 </div>
+                {(editProduct.colors || []).length > 0 && (
+                  <div className="space-y-2 rounded border border-border p-3">
+                    <p className="font-body text-xs tracking-wider uppercase text-muted-foreground">Color images</p>
+                    {(editProduct.colors || []).map((color: string) => (
+                      <div key={color} className="grid grid-cols-[72px_1fr_auto] items-center gap-3">
+                        <div className="h-14 w-14 overflow-hidden rounded border border-border bg-linen">
+                          {editProduct.color_images?.[color] ? (
+                            <img src={editProduct.color_images[color]} alt={`${color} product`} className="h-full w-full object-cover" />
+                          ) : null}
+                        </div>
+                        <Input
+                          value={editProduct.color_images?.[color] || ""}
+                          onChange={(e) => setEditProduct({
+                            ...editProduct,
+                            color_images: { ...(editProduct.color_images || {}), [color]: e.target.value },
+                          })}
+                          placeholder={`${color} image URL`}
+                        />
+                        <label className="inline-flex">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            disabled={uploading}
+                            onChange={(e) => {
+                              const files = e.target.files;
+                              if (files) handleImageUpload(files, "color", color);
+                              e.target.value = "";
+                            }}
+                          />
+                          <span className="inline-flex h-10 items-center rounded border border-input bg-background px-3 font-body text-xs tracking-wider uppercase cursor-pointer hover:bg-muted">
+                            Upload
+                          </span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
+
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 font-body text-sm">
                   <Switch checked={editProduct.in_stock} onCheckedChange={(v) => setEditProduct({ ...editProduct, in_stock: v })} />
@@ -364,7 +492,7 @@ const AdminProducts = () => {
                 </label>
               </div>
               <Button onClick={handleSave} disabled={saveMutation.isPending || uploading} className="w-full bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs py-5">
-                {uploading ? "Uploading image..." : saveMutation.isPending ? "Saving..." : "Save Product"}
+                {uploading ? "Uploading images..." : saveMutation.isPending ? "Saving..." : "Save Product"}
               </Button>
             </div>
           )}

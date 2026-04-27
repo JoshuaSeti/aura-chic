@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
-import { getProductImage } from "@/lib/productImages";
+import { getPrimaryProductImage } from "@/lib/productImages";
 import { formatPrice } from "@/lib/utils";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -54,7 +54,15 @@ const ProductDetail = () => {
     );
   }
 
-  const image = getProductImage(product.slug, product.image_url);
+  const colorImages = (product.color_images || {}) as Record<string, string>;
+  const galleryImages = Array.from(
+    new Set([
+      getPrimaryProductImage({ slug: product.slug, imageUrl: product.image_url, images: product.images, colorImages, selectedColor }),
+      ...(product.images || []),
+      ...Object.values(colorImages),
+    ].filter(Boolean))
+  );
+  const image = galleryImages[0];
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
   const sizes = product.sizes?.filter((s) => s.length > 0) || [];
   const colors = product.colors?.filter((c) => c.length > 0) || [];
@@ -76,8 +84,27 @@ const ProductDetail = () => {
       <div className="container mx-auto px-4 py-12 flex-1">
         <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
           {/* Image */}
-          <div className="bg-linen rounded overflow-hidden">
-            <img src={image} alt={product.name} className="w-full aspect-[3/4] object-cover" />
+          <div className="space-y-3">
+            <div className="bg-linen rounded overflow-hidden">
+              <img src={image} alt={product.name} className="w-full aspect-[3/4] object-cover" />
+            </div>
+            {galleryImages.length > 1 && (
+              <div className="grid grid-cols-5 gap-2">
+                {galleryImages.map((galleryImage) => (
+                  <button
+                    key={galleryImage}
+                    type="button"
+                    onClick={() => {
+                      const matchingColor = Object.entries(colorImages).find(([, url]) => url === galleryImage)?.[0];
+                      if (matchingColor) setSelectedColor(matchingColor);
+                    }}
+                    className={`aspect-square overflow-hidden rounded border bg-linen ${galleryImage === image ? "border-primary" : "border-border"}`}
+                  >
+                    <img src={galleryImage} alt={`${product.name} preview`} className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Info */}

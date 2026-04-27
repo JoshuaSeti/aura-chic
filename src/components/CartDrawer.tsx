@@ -2,7 +2,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { getProductImage } from "@/lib/productImages";
+import { getPrimaryProductImage } from "@/lib/productImages";
 import { formatPrice } from "@/lib/utils";
 import { Link } from "react-router-dom";
 
@@ -26,7 +26,13 @@ const CartDrawer = () => {
               {items.map((item) => (
                 <div key={item.product.id + (item.selectedSize || "") + (item.selectedColor || "")} className="flex gap-4">
                   <img
-                    src={getProductImage(item.product.slug, item.product.image_url)}
+                    src={getPrimaryProductImage({
+                      slug: item.product.slug,
+                      imageUrl: item.product.image_url,
+                      images: item.product.images,
+                      colorImages: item.product.color_images as Record<string, string> | null,
+                      selectedColor: item.selectedColor,
+                    })}
                     alt={item.product.name}
                     className="w-20 h-24 object-cover rounded"
                   />

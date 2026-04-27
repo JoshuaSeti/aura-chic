@@ -53,7 +53,7 @@ const AdminProducts = () => {
 
     const { error } = await supabase
       .from("products")
-      .update(updates)
+      .update(updates as any)
       .eq("id", editProduct.id);
 
     if (error) throw error;

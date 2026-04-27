@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Tables } from "@/integrations/supabase/types";
-import { getProductImage } from "@/lib/productImages";
+import { getPrimaryProductImage } from "@/lib/productImages";
 import { formatPrice } from "@/lib/utils";
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/hooks/useWishlist";
@@ -8,7 +8,12 @@ import { useWishlist } from "@/hooks/useWishlist";
 type Product = Tables<"products">;
 
 const ProductCard = ({ product }: { product: Product }) => {
-  const image = getProductImage(product.slug, product.image_url);
+  const image = getPrimaryProductImage({
+    slug: product.slug,
+    imageUrl: product.image_url,
+    images: product.images,
+    colorImages: product.color_images as Record<string, string> | null,
+  });
   const hasDiscount = product.compare_at_price && product.compare_at_price > product.price;
   const { isInWishlist, toggleWishlist, isAuthenticated } = useWishlist();
   const wishlisted = isInWishlist(product.id);

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { getProductImage } from "@/lib/productImages";
+import { getPrimaryProductImage } from "@/lib/productImages";
 import { formatPrice } from "@/lib/utils";
 
 const Checkout = () => {
@@ -99,7 +99,13 @@ const Checkout = () => {
             <div className="space-y-4">
               {items.map((item) => (
                 <div key={item.product.id} className="flex gap-3">
-                  <img src={getProductImage(item.product.slug, item.product.image_url)} alt={item.product.name} className="w-16 h-20 object-cover rounded" />
+                  <img src={getPrimaryProductImage({
+                      slug: item.product.slug,
+                      imageUrl: item.product.image_url,
+                      images: item.product.images,
+                      colorImages: item.product.color_images as Record<string, string> | null,
+                      selectedColor: item.selectedColor,
+                    })} alt={item.product.name} className="w-16 h-20 object-cover rounded" />
                   <div className="flex-1">
                     <p className="font-body text-sm">{item.product.name}</p>
                     <p className="font-body text-xs text-muted-foreground">Qty: {item.quantity}</p>

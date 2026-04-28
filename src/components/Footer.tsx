@@ -76,9 +76,6 @@ const Footer = () => {
           <p className="font-body text-xs text-secondary-foreground/50">
             © 2026 SosoFab Lifestyle. All rights reserved.
           </p>
-          <Link to="/admin/login" className="font-body text-xs text-secondary-foreground/30 hover:text-secondary-foreground/50 transition-colors">
-            Admin
-          </Link>
         </div>
       </div>
     </footer>

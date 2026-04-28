@@ -14,7 +14,8 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/utils";
 
-const COMMON_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "One Size"];
+const COMMON_SIZES = Array.from({ length: 26 }, (_, index) => String(index + 30));
+const DEFAULT_SIZES = Array.from({ length: 15 }, (_, index) => String(index + 36));
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
 
 const AdminProducts = () => {
@@ -176,7 +177,7 @@ const AdminProducts = () => {
   });
 
   const openNew = () => {
-    setEditProduct({ name: "", slug: "", description: "", price: 0, compare_at_price: null, category_id: null, image_url: "", images: [], color_images: {}, in_stock: true, featured: false, sizes: [], colors: [] });
+    setEditProduct({ name: "", slug: "", description: "", price: 0, compare_at_price: null, category_id: null, image_url: "", images: [], color_images: {}, in_stock: true, featured: false, sizes: DEFAULT_SIZES, colors: [] });
     setDialogOpen(true);
   };
 
@@ -366,7 +367,7 @@ const AdminProducts = () => {
 
               <div>
                 <label className="font-body text-xs tracking-wider uppercase block mb-2">Sizes</label>
-                <div className="flex flex-wrap gap-3">
+                <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-7 gap-3">
                   {COMMON_SIZES.map((size) => {
                     const checked = (editProduct.sizes || []).includes(size);
                     return (

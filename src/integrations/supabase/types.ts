@@ -141,6 +141,9 @@ export type Database = {
           discount_code: string | null
           id: string
           items: Json
+          payment_provider: string | null
+          payment_reference: string | null
+          payment_status: string
           shipping_address: string
           status: string
           total: number
@@ -155,6 +158,9 @@ export type Database = {
           discount_code?: string | null
           id?: string
           items?: Json
+          payment_provider?: string | null
+          payment_reference?: string | null
+          payment_status?: string
           shipping_address: string
           status?: string
           total: number
@@ -169,6 +175,9 @@ export type Database = {
           discount_code?: string | null
           id?: string
           items?: Json
+          payment_provider?: string | null
+          payment_reference?: string | null
+          payment_status?: string
           shipping_address?: string
           status?: string
           total?: number

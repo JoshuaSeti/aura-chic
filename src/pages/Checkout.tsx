@@ -49,23 +49,30 @@ const Checkout = () => {
       color: i.selectedColor,
     }));
 
-    const { error } = await supabase.from("orders").insert({
-      customer_name: form.name,
-      customer_email: form.email,
-      customer_phone: form.phone || null,
-      shipping_address: form.address,
-      items: orderItems,
-      total,
+    const origin = window.location.origin;
+
+    const { data, error } = await supabase.functions.invoke("payfast-checkout", {
+      body: {
+        customer_name: form.name,
+        customer_email: form.email,
+        customer_phone: form.phone || null,
+        shipping_address: form.address,
+        items: orderItems,
+        total,
+        return_url: `${origin}/?payment=success`,
+        cancel_url: `${origin}/checkout?payment=cancelled`,
+      },
     });
 
-    if (error) {
-      toast.error("Failed to place order");
-    } else {
-      clearCart();
-      toast.success("Order placed successfully!");
-      navigate("/");
+    if (error || !data?.redirect_url) {
+      toast.error("Failed to initiate payment");
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    clearCart();
+    // Redirect to Payfast hosted checkout
+    window.location.href = data.redirect_url;
   };
 
   return (

@@ -111,8 +111,9 @@ Deno.serve(async (req) => {
       ? items.map((i: any) => `${i.name} x${i.quantity}`).join(", ").slice(0, 250)
       : "Order";
 
-    // Build data object in the order Payfast expects
-    const data: Record<string, string> = {
+    // Build data object in the order Payfast expects.
+    // Trim every value here so signature input matches what we submit in the URL.
+    const rawData: Record<string, string> = {
       merchant_id: merchantId,
       merchant_key: merchantKey,
       return_url: return_url || "",
@@ -128,6 +129,12 @@ Deno.serve(async (req) => {
       item_description: itemDescription,
       custom_str1: order.id,
     };
+
+    const data: Record<string, string> = {};
+    for (const [k, v] of Object.entries(rawData)) {
+      const trimmed = String(v ?? "").trim();
+      if (trimmed !== "") data[k] = trimmed;
+    }
 
     const signature = buildSignature(data, passphrase);
     const finalParams = { ...data, signature };

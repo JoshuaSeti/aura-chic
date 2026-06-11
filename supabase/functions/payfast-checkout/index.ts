@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 
 const PAYFAST_URL = "https://www.payfast.co.za/eng/process";
 
-// PHP-style urlencode: uppercase hex, spaces as '+'
+// PHP-style urlencode: uppercase hex, spaces as '+', encodes ~ as %7E
 function phpUrlencode(value: string): string {
   return encodeURIComponent(value)
     .replace(/%[0-9a-f]{2}/g, (m) => m.toUpperCase())
@@ -13,17 +13,18 @@ function phpUrlencode(value: string): string {
     .replace(/\*/g, "%2A")
     .replace(/'/g, "%27")
     .replace(/\(/g, "%28")
-    .replace(/\)/g, "%29");
+    .replace(/\)/g, "%29")
+    .replace(/~/g, "%7E");
 }
 
 function buildSignature(data: Record<string, string>, passphrase?: string): string {
-  // Payfast: use the order the fields are sent in (NOT alphabetical) when generating signature
+  // Payfast: pairs in the order they're submitted; empties skipped
   const pairs = Object.entries(data)
     .filter(([, v]) => v !== undefined && v !== null && v !== "")
-    .map(([k, v]) => `${k}=${phpUrlencode(String(v).trim())}`);
+    .map(([k, v]) => `${k}=${phpUrlencode(String(v))}`);
   let signatureString = pairs.join("&");
   if (passphrase && passphrase.length > 0) {
-    signatureString += `&passphrase=${phpUrlencode(passphrase.trim())}`;
+    signatureString += `&passphrase=${phpUrlencode(passphrase)}`;
   }
   return createHash("md5").update(signatureString).digest("hex");
 }

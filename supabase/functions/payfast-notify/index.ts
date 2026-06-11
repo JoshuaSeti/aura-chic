@@ -10,16 +10,17 @@ function phpUrlencode(value: string): string {
     .replace(/\*/g, "%2A")
     .replace(/'/g, "%27")
     .replace(/\(/g, "%28")
-    .replace(/\)/g, "%29");
+    .replace(/\)/g, "%29")
+    .replace(/~/g, "%7E");
 }
 
 function buildSignature(data: Record<string, string>, passphrase?: string): string {
   const pairs = Object.entries(data)
     .filter(([k, v]) => k !== "signature" && v !== undefined && v !== null && v !== "")
-    .map(([k, v]) => `${k}=${phpUrlencode(String(v).trim())}`);
+    .map(([k, v]) => `${k}=${phpUrlencode(String(v))}`);
   let s = pairs.join("&");
   if (passphrase && passphrase.length > 0) {
-    s += `&passphrase=${phpUrlencode(passphrase.trim())}`;
+    s += `&passphrase=${phpUrlencode(passphrase)}`;
   }
   return createHash("md5").update(s).digest("hex");
 }

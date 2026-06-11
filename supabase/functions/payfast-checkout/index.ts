@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 
 const PAYFAST_URL = "https://www.payfast.co.za/eng/process";
 
-// PHP-style urlencode: uppercase hex, spaces as '+'
+// PHP-style urlencode: uppercase hex, spaces as '+', encodes ~ as %7E
 function phpUrlencode(value: string): string {
   return encodeURIComponent(value)
     .replace(/%[0-9a-f]{2}/g, (m) => m.toUpperCase())
@@ -13,17 +13,18 @@ function phpUrlencode(value: string): string {
     .replace(/\*/g, "%2A")
     .replace(/'/g, "%27")
     .replace(/\(/g, "%28")
-    .replace(/\)/g, "%29");
+    .replace(/\)/g, "%29")
+    .replace(/~/g, "%7E");
 }
 
 function buildSignature(data: Record<string, string>, passphrase?: string): string {
-  // Payfast: use the order the fields are sent in (NOT alphabetical) when generating signature
+  // Payfast: pairs in the order they're submitted; empties skipped
   const pairs = Object.entries(data)
     .filter(([, v]) => v !== undefined && v !== null && v !== "")
-    .map(([k, v]) => `${k}=${phpUrlencode(String(v).trim())}`);
+    .map(([k, v]) => `${k}=${phpUrlencode(String(v))}`);
   let signatureString = pairs.join("&");
   if (passphrase && passphrase.length > 0) {
-    signatureString += `&passphrase=${phpUrlencode(passphrase.trim())}`;
+    signatureString += `&passphrase=${phpUrlencode(passphrase)}`;
   }
   return createHash("md5").update(signatureString).digest("hex");
 }
@@ -110,8 +111,9 @@ Deno.serve(async (req) => {
       ? items.map((i: any) => `${i.name} x${i.quantity}`).join(", ").slice(0, 250)
       : "Order";
 
-    // Build data object in the order Payfast expects
-    const data: Record<string, string> = {
+    // Build data object in the order Payfast expects.
+    // Trim every value here so signature input matches what we submit in the URL.
+    const rawData: Record<string, string> = {
       merchant_id: merchantId,
       merchant_key: merchantKey,
       return_url: return_url || "",
@@ -127,6 +129,12 @@ Deno.serve(async (req) => {
       item_description: itemDescription,
       custom_str1: order.id,
     };
+
+    const data: Record<string, string> = {};
+    for (const [k, v] of Object.entries(rawData)) {
+      const trimmed = String(v ?? "").trim();
+      if (trimmed !== "") data[k] = trimmed;
+    }
 
     const signature = buildSignature(data, passphrase);
     const finalParams = { ...data, signature };

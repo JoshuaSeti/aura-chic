@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
       cancel_url,
     } = body;
 
-    if (!customer_name || !customer_email || !shipping_address || !items?.length || !total) {
+    if (!customer_name || !customer_email || !customer_phone || !shipping_address || !items?.length || !total) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

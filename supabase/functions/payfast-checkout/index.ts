@@ -36,9 +36,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const merchantId = Deno.env.get("PAYFAST_MERCHANT_ID");
-    const merchantKey = Deno.env.get("PAYFAST_MERCHANT_KEY");
-    const passphrase = Deno.env.get("PAYFAST_PASSPHRASE") ?? "";
+    const merchantId = SANDBOX ? "10000100" : Deno.env.get("PAYFAST_MERCHANT_ID");
+    const merchantKey = SANDBOX ? "46f0cd694581a" : Deno.env.get("PAYFAST_MERCHANT_KEY");
+    const passphrase = SANDBOX ? "" : (Deno.env.get("PAYFAST_PASSPHRASE") ?? "");
 
     if (!merchantId || !merchantKey) {
       return new Response(JSON.stringify({ error: "Payfast not configured" }), {

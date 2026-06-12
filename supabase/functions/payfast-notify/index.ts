@@ -26,7 +26,10 @@ function buildSignature(data: Record<string, string>, passphrase?: string): stri
 }
 
 // Valid Payfast IP ranges (resolve hostnames at runtime)
-const PAYFAST_HOSTS = ["www.payfast.co.za", "sandbox.payfast.co.za", "w1w.payfast.co.za", "w2w.payfast.co.za"];
+const SANDBOX = (Deno.env.get("PAYFAST_SANDBOX") ?? "true").toLowerCase() !== "false";
+const PAYFAST_HOSTS = SANDBOX
+  ? ["sandbox.payfast.co.za"]
+  : ["www.payfast.co.za", "w1w.payfast.co.za", "w2w.payfast.co.za"];
 
 async function isValidSourceIp(ip: string): Promise<boolean> {
   try {
@@ -47,7 +50,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const passphrase = Deno.env.get("PAYFAST_PASSPHRASE") ?? "";
+    const passphrase = SANDBOX ? "" : (Deno.env.get("PAYFAST_PASSPHRASE") ?? "");
 
     // Parse form-encoded body
     const text = await req.text();
@@ -81,7 +84,9 @@ Deno.serve(async (req) => {
     const validateBody = Object.entries(dataForSig)
       .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
       .join("&");
-    const validateUrl = "https://www.payfast.co.za/eng/query/validate";
+    const validateUrl = SANDBOX
+      ? "https://sandbox.payfast.co.za/eng/query/validate"
+      : "https://www.payfast.co.za/eng/query/validate";
     const validateRes = await fetch(validateUrl, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },

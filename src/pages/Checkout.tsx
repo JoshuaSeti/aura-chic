@@ -89,7 +89,7 @@ const Checkout = () => {
             <h2 className="font-display text-xl mb-4">Shipping Details</h2>
             <Input placeholder="Full Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="font-body" />
             <Input type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required className="font-body" />
-            <Input placeholder="Phone (optional)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="font-body" />
+            <Input placeholder="Phone" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} required className="font-body" />
             <Textarea placeholder="Shipping Address" value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} required className="font-body" />
             <Button
               type="submit"

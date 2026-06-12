@@ -2,7 +2,10 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createHash } from "node:crypto";
 
-const PAYFAST_URL = "https://www.payfast.co.za/eng/process";
+const SANDBOX = (Deno.env.get("PAYFAST_SANDBOX") ?? "true").toLowerCase() !== "false";
+const PAYFAST_URL = SANDBOX
+  ? "https://sandbox.payfast.co.za/eng/process"
+  : "https://www.payfast.co.za/eng/process";
 
 // PHP-style urlencode: uppercase hex, spaces as '+', encodes ~ as %7E
 function phpUrlencode(value: string): string {
@@ -33,9 +36,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const merchantId = Deno.env.get("PAYFAST_MERCHANT_ID");
-    const merchantKey = Deno.env.get("PAYFAST_MERCHANT_KEY");
-    const passphrase = Deno.env.get("PAYFAST_PASSPHRASE") ?? "";
+    const merchantId = SANDBOX ? "10000100" : Deno.env.get("PAYFAST_MERCHANT_ID");
+    const merchantKey = SANDBOX ? "46f0cd694581a" : Deno.env.get("PAYFAST_MERCHANT_KEY");
+    const passphrase = SANDBOX ? "" : (Deno.env.get("PAYFAST_PASSPHRASE") ?? "");
 
     if (!merchantId || !merchantKey) {
       return new Response(JSON.stringify({ error: "Payfast not configured" }), {
@@ -58,7 +61,7 @@ Deno.serve(async (req) => {
       cancel_url,
     } = body;
 
-    if (!customer_name || !customer_email || !shipping_address || !items?.length || !total) {
+    if (!customer_name || !customer_email || !customer_phone || !shipping_address || !items?.length || !total) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

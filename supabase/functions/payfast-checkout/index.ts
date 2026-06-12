@@ -2,7 +2,10 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createHash } from "node:crypto";
 
-const PAYFAST_URL = "https://www.payfast.co.za/eng/process";
+const SANDBOX = (Deno.env.get("PAYFAST_SANDBOX") ?? "true").toLowerCase() !== "false";
+const PAYFAST_URL = SANDBOX
+  ? "https://sandbox.payfast.co.za/eng/process"
+  : "https://www.payfast.co.za/eng/process";
 
 // PHP-style urlencode: uppercase hex, spaces as '+', encodes ~ as %7E
 function phpUrlencode(value: string): string {

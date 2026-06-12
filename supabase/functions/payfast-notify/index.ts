@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const passphrase = Deno.env.get("PAYFAST_PASSPHRASE") ?? "";
+    const passphrase = SANDBOX ? "" : (Deno.env.get("PAYFAST_PASSPHRASE") ?? "");
 
     // Parse form-encoded body
     const text = await req.text();

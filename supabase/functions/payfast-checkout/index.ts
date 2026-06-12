@@ -16,8 +16,7 @@ function phpUrlencode(value: string): string {
     .replace(/\*/g, "%2A")
     .replace(/'/g, "%27")
     .replace(/\(/g, "%28")
-    .replace(/\)/g, "%29")
-    .replace(/~/g, "%7E");
+    .replace(/\)/g, "%29");
 }
 
 function buildSignature(data: Record<string, string>, passphrase?: string): string {
@@ -125,7 +124,7 @@ Deno.serve(async (req) => {
       name_first: firstName,
       name_last: lastName,
       email_address: customer_email,
-      ...(customer_phone ? { cell_number: String(customer_phone).replace(/\D/g, "").slice(0, 11) } : {}),
+      // cell_number intentionally omitted — Payfast rejects non-SA formats and causes signature mismatch on their redirect.
       m_payment_id: order.id,
       amount: Number(total).toFixed(2),
       item_name: itemName.slice(0, 100),

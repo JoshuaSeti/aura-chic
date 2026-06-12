@@ -2,10 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createHash } from "node:crypto";
 
-const SANDBOX = (Deno.env.get("PAYFAST_SANDBOX") ?? "true").toLowerCase() !== "false";
-const PAYFAST_URL = SANDBOX
-  ? "https://sandbox.payfast.co.za/eng/process"
-  : "https://www.payfast.co.za/eng/process";
+const PAYFAST_URL = "https://www.payfast.co.za/eng/process";
 
 // PHP-style urlencode: uppercase hex, spaces as '+', encodes ~ as %7E
 function phpUrlencode(value: string): string {
@@ -16,7 +13,8 @@ function phpUrlencode(value: string): string {
     .replace(/\*/g, "%2A")
     .replace(/'/g, "%27")
     .replace(/\(/g, "%28")
-    .replace(/\)/g, "%29");
+    .replace(/\)/g, "%29")
+    .replace(/~/g, "%7E");
 }
 
 function buildSignature(data: Record<string, string>, passphrase?: string): string {
@@ -35,9 +33,9 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const merchantId = SANDBOX ? "10000100" : Deno.env.get("PAYFAST_MERCHANT_ID");
-    const merchantKey = SANDBOX ? "46f0cd694581a" : Deno.env.get("PAYFAST_MERCHANT_KEY");
-    const passphrase = SANDBOX ? "" : (Deno.env.get("PAYFAST_PASSPHRASE") ?? "");
+    const merchantId = Deno.env.get("PAYFAST_MERCHANT_ID");
+    const merchantKey = Deno.env.get("PAYFAST_MERCHANT_KEY");
+    const passphrase = Deno.env.get("PAYFAST_PASSPHRASE") ?? "";
 
     if (!merchantId || !merchantKey) {
       return new Response(JSON.stringify({ error: "Payfast not configured" }), {
@@ -60,7 +58,7 @@ Deno.serve(async (req) => {
       cancel_url,
     } = body;
 
-    if (!customer_name || !customer_email || !customer_phone || !shipping_address || !items?.length || !total) {
+    if (!customer_name || !customer_email || !shipping_address || !items?.length || !total) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -124,7 +122,7 @@ Deno.serve(async (req) => {
       name_first: firstName,
       name_last: lastName,
       email_address: customer_email,
-      // cell_number intentionally omitted — Payfast rejects non-SA formats and causes signature mismatch on their redirect.
+      ...(customer_phone ? { cell_number: String(customer_phone).replace(/\D/g, "").slice(0, 11) } : {}),
       m_payment_id: order.id,
       amount: Number(total).toFixed(2),
       item_name: itemName.slice(0, 100),

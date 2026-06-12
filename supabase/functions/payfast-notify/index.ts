@@ -84,7 +84,9 @@ Deno.serve(async (req) => {
     const validateBody = Object.entries(dataForSig)
       .map(([k, v]) => `${k}=${encodeURIComponent(v)}`)
       .join("&");
-    const validateUrl = "https://www.payfast.co.za/eng/query/validate";
+    const validateUrl = SANDBOX
+      ? "https://sandbox.payfast.co.za/eng/query/validate"
+      : "https://www.payfast.co.za/eng/query/validate";
     const validateRes = await fetch(validateUrl, {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },

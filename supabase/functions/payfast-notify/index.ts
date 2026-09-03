@@ -106,10 +106,10 @@ Deno.serve(async (req) => {
     );
 
     let nextPaymentStatus = "pending";
-    let nextStatus = "pending";
+    let nextStatus = "awaiting_payment";
     if (paymentStatus === "COMPLETE") {
       nextPaymentStatus = "paid";
-      nextStatus = "paid";
+      nextStatus = "processing";
     } else if (paymentStatus === "FAILED") {
       nextPaymentStatus = "failed";
       nextStatus = "cancelled";

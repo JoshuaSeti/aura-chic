@@ -82,7 +82,7 @@ Deno.serve(async (req) => {
         total,
         discount_code: discount_code || null,
         discount_amount: discount_amount || 0,
-        status: "pending",
+        status: "awaiting_payment",
         payment_provider: "payfast",
         payment_status: "pending",
       })

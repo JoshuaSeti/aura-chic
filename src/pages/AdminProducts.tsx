@@ -15,8 +15,8 @@ import { toast } from "sonner";
 import ConfirmDeleteButton from "@/components/admin/ConfirmDeleteButton";
 import { formatPrice } from "@/lib/utils";
 
-const COMMON_SIZES = Array.from({ length: 27 }, (_, index) => String(index + 30));
-const DEFAULT_SIZES = Array.from({ length: 15 }, (_, index) => String(index + 36));
+const COMMON_SIZES = Array.from({ length: 11 }, (_, index) => String(36 + index * 2));
+const DEFAULT_SIZES = [...COMMON_SIZES];
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
 
 const AdminProducts = () => {

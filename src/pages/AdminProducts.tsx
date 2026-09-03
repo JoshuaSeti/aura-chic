@@ -14,7 +14,7 @@ import { useState, useRef } from "react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/utils";
 
-const COMMON_SIZES = Array.from({ length: 26 }, (_, index) => String(index + 30));
+const COMMON_SIZES = Array.from({ length: 27 }, (_, index) => String(index + 30));
 const DEFAULT_SIZES = Array.from({ length: 15 }, (_, index) => String(index + 36));
 const MAX_FILE_SIZE = 3 * 1024 * 1024;
 

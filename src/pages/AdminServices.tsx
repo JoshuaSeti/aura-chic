@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Pencil, Trash2, Upload } from "lucide-react";
+import { Plus, Pencil, Upload } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import ConfirmDeleteButton from "@/components/admin/ConfirmDeleteButton";

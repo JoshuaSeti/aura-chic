@@ -5,9 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Pencil } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "@/components/admin/ConfirmDeleteButton";
 
 const AdminCategories = () => {
   const queryClient = useQueryClient();
@@ -81,7 +82,7 @@ const AdminCategories = () => {
                 <TableCell>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => { setEditCat(c); setDialogOpen(true); }}><Pencil className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(c.id)} className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                    <ConfirmDeleteButton itemName={c.name} title="Delete category?" description="Deleting this category will unlink it from its products. This action cannot be undone." onConfirm={() => deleteMutation.mutate(c.id)} />
                   </div>
                 </TableCell>
               </TableRow>

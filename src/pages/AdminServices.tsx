@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash2, Upload } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
+import ConfirmDeleteButton from "@/components/admin/ConfirmDeleteButton";
 import { formatPrice } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -171,7 +172,7 @@ const AdminServices = () => {
                 <TableCell>
                   <div className="flex gap-1">
                     <Button variant="ghost" size="icon" onClick={() => openEdit(s)}><Pencil className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" onClick={() => deleteMutation.mutate(s.id)} className="text-destructive"><Trash2 className="h-4 w-4" /></Button>
+                    <ConfirmDeleteButton itemName={s.name} title="Delete service?" onConfirm={() => deleteMutation.mutate(s.id)} />
                   </div>
                 </TableCell>
               </TableRow>

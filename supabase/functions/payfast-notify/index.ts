@@ -121,13 +121,18 @@ Deno.serve(async (req) => {
     // Fetch order to confirm amount matches
     const { data: order } = await supabase
       .from("orders")
-      .select("id, total")
+      .select("id, total, payment_status")
       .eq("id", orderId)
       .maybeSingle();
 
     if (!order) {
       console.error("Order not found:", orderId);
       return new Response("Order not found", { status: 404 });
+    }
+
+    // Idempotent: never overwrite a confirmed payment
+    if (order.payment_status === "paid") {
+      return new Response("OK", { status: 200 });
     }
 
     const grossAmount = parseFloat(data.amount_gross || "0");

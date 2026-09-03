@@ -8,10 +8,18 @@ import { format } from "date-fns";
 import { formatPrice } from "@/lib/utils";
 
 const statusColors: Record<string, string> = {
+  awaiting_payment: "bg-orange-100 text-orange-800",
   pending: "bg-yellow-100 text-yellow-800",
   processing: "bg-blue-100 text-blue-800",
   shipped: "bg-primary/20 text-primary",
   delivered: "bg-green-100 text-green-800",
+  cancelled: "bg-destructive/20 text-destructive",
+};
+
+const paymentColors: Record<string, string> = {
+  pending: "bg-orange-100 text-orange-800",
+  paid: "bg-green-100 text-green-800",
+  failed: "bg-destructive/20 text-destructive",
   cancelled: "bg-destructive/20 text-destructive",
 };
 
@@ -48,15 +56,16 @@ const AdminOrders = () => {
               <TableHead className="font-body text-xs tracking-wider uppercase">Order</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Customer</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Total</TableHead>
+              <TableHead className="font-body text-xs tracking-wider uppercase">Payment</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Status</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={5} className="text-center font-body text-muted-foreground py-8">Loading...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center font-body text-muted-foreground py-8">Loading...</TableCell></TableRow>
             ) : orders?.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center font-body text-muted-foreground py-8">No orders yet</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center font-body text-muted-foreground py-8">No orders yet</TableCell></TableRow>
             ) : orders?.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-body text-xs text-muted-foreground">{order.id.slice(0, 8)}...</TableCell>
@@ -68,16 +77,27 @@ const AdminOrders = () => {
                 </TableCell>
                 <TableCell className="font-body text-sm font-semibold">{formatPrice(order.total)}</TableCell>
                 <TableCell>
-                  <Select value={order.status} onValueChange={(v) => updateStatus.mutate({ id: order.id, status: v })}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["pending", "processing", "shipped", "delivered", "cancelled"].map((s) => (
-                        <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Badge className={`capitalize font-body text-xs ${paymentColors[order.payment_status] || "bg-muted text-muted-foreground"}`}>
+                    {order.payment_status === "paid" ? "Paid" : order.payment_status === "pending" ? "Awaiting Payment" : order.payment_status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {order.payment_status === "paid" ? (
+                    <Select value={order.status} onValueChange={(v) => updateStatus.mutate({ id: order.id, status: v })}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["processing", "shipped", "delivered", "cancelled"].map((s) => (
+                          <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Badge className={`capitalize font-body text-xs ${statusColors[order.status] || "bg-muted text-muted-foreground"}`}>
+                      {order.status === "awaiting_payment" ? "Awaiting Payment" : order.status}
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell className="font-body text-xs text-muted-foreground">
                   {format(new Date(order.created_at), "MMM d, yyyy")}

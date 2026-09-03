@@ -77,16 +77,27 @@ const AdminOrders = () => {
                 </TableCell>
                 <TableCell className="font-body text-sm font-semibold">{formatPrice(order.total)}</TableCell>
                 <TableCell>
-                  <Select value={order.status} onValueChange={(v) => updateStatus.mutate({ id: order.id, status: v })}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {["pending", "processing", "shipped", "delivered", "cancelled"].map((s) => (
-                        <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Badge className={`capitalize font-body text-xs ${paymentColors[order.payment_status] || "bg-muted text-muted-foreground"}`}>
+                    {order.payment_status === "paid" ? "Paid" : order.payment_status === "pending" ? "Awaiting Payment" : order.payment_status}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  {order.payment_status === "paid" ? (
+                    <Select value={order.status} onValueChange={(v) => updateStatus.mutate({ id: order.id, status: v })}>
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["processing", "shipped", "delivered", "cancelled"].map((s) => (
+                          <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Badge className={`capitalize font-body text-xs ${statusColors[order.status] || "bg-muted text-muted-foreground"}`}>
+                      {order.status === "awaiting_payment" ? "Awaiting Payment" : order.status}
+                    </Badge>
+                  )}
                 </TableCell>
                 <TableCell className="font-body text-xs text-muted-foreground">
                   {format(new Date(order.created_at), "MMM d, yyyy")}

@@ -56,15 +56,16 @@ const AdminOrders = () => {
               <TableHead className="font-body text-xs tracking-wider uppercase">Order</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Customer</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Total</TableHead>
+              <TableHead className="font-body text-xs tracking-wider uppercase">Payment</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Status</TableHead>
               <TableHead className="font-body text-xs tracking-wider uppercase">Date</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
-              <TableRow><TableCell colSpan={5} className="text-center font-body text-muted-foreground py-8">Loading...</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center font-body text-muted-foreground py-8">Loading...</TableCell></TableRow>
             ) : orders?.length === 0 ? (
-              <TableRow><TableCell colSpan={5} className="text-center font-body text-muted-foreground py-8">No orders yet</TableCell></TableRow>
+              <TableRow><TableCell colSpan={6} className="text-center font-body text-muted-foreground py-8">No orders yet</TableCell></TableRow>
             ) : orders?.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-body text-xs text-muted-foreground">{order.id.slice(0, 8)}...</TableCell>

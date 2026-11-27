@@ -12,6 +12,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/hooks/useWishlist";
+import { isBlackFridayProduct } from "@/lib/blackFriday";
 
 const ProductDetail = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -113,6 +114,9 @@ const ProductDetail = () => {
           {/* Info */}
           <div className="flex flex-col justify-center space-y-6">
             <div>
+              {isBlackFridayProduct(product.created_at) && (
+                <span className="inline-block mb-3 bg-foreground text-gold-light font-body text-[10px] px-3 py-1 tracking-[0.25em] uppercase">Black Friday</span>
+              )}
               <p className="font-body text-xs tracking-[0.3em] uppercase text-primary mb-2">SosoFab Lifestyle</p>
               <h1 className="font-display text-3xl md:text-4xl font-light">{product.name}</h1>
             </div>

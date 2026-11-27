@@ -26,6 +26,9 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
+      <Link to="/shop" className="block bg-foreground text-background text-center py-2 font-body text-[11px] md:text-xs tracking-[0.3em] uppercase">
+        <span className="text-gold-light font-semibold">Black Friday</span> · Exclusive deals on new arrivals · Shop now
+      </Link>
       <div className="container mx-auto px-4 flex items-center justify-between h-16 md:h-20">
         {/* Mobile menu toggle */}
         <button className="md:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>

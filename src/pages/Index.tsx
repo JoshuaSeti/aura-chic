@@ -69,6 +69,18 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Black Friday */}
+      <section className="bg-foreground text-background py-14">
+        <div className="container mx-auto px-4 text-center">
+          <p className="font-body text-xs tracking-[0.4em] uppercase text-gold-light mb-3">Limited Time</p>
+          <h2 className="font-display text-4xl md:text-6xl font-light mb-4">Black Friday</h2>
+          <p className="font-body text-sm text-background/70 mb-8 max-w-md mx-auto">Our newest arrivals, now part of the Black Friday edit. Look for the Black Friday label.</p>
+          <Link to="/shop">
+            <Button className="bg-primary text-primary-foreground font-body tracking-widest uppercase text-xs px-8 py-6 hover:bg-primary/90">Shop Black Friday</Button>
+          </Link>
+        </div>
+      </section>
+
       {/* Featured Products */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">

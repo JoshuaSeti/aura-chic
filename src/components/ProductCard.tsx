@@ -4,6 +4,7 @@ import { getPrimaryProductImage } from "@/lib/productImages";
 import { formatPrice } from "@/lib/utils";
 import { Heart } from "lucide-react";
 import { useWishlist } from "@/hooks/useWishlist";
+import { isBlackFridayProduct } from "@/lib/blackFriday";
 
 type Product = Tables<"products">;
 
@@ -28,6 +29,11 @@ const ProductCard = ({ product }: { product: Product }) => {
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             loading="lazy"
           />
+          {isBlackFridayProduct(product.created_at) && (
+            <span className="absolute bottom-3 left-3 bg-foreground text-gold-light font-body text-[10px] px-2 py-1 tracking-[0.2em] uppercase">
+              Black Friday
+            </span>
+          )}
           {hasDiscount && (
             <span className="absolute top-3 left-3 bg-primary text-primary-foreground font-body text-xs px-2 py-1 tracking-wider uppercase">
               Sale

@@ -2,6 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createHash } from "node:crypto";
 
+const SHIPPING_FEE = 200;
 const PAYFAST_URL = "https://www.payfast.co.za/eng/process";
 
 // PHP-style urlencode: uppercase hex, spaces as '+', encodes ~ as %7E
@@ -51,19 +52,21 @@ Deno.serve(async (req) => {
       customer_phone,
       shipping_address,
       items,
-      total,
+      subtotal,
       discount_code,
       discount_amount,
       return_url,
       cancel_url,
     } = body;
 
-    if (!customer_name || !customer_email || !shipping_address || !items?.length || !total) {
+    if (!customer_name || !customer_email || !shipping_address || !items?.length || !(Number(subtotal) > 0)) {
       return new Response(JSON.stringify({ error: "Missing required fields" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const total = Number(subtotal) + SHIPPING_FEE;
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,

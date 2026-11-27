@@ -12,8 +12,11 @@ import { toast } from "sonner";
 import { getPrimaryProductImage } from "@/lib/productImages";
 import { formatPrice } from "@/lib/utils";
 
+export const SHIPPING_FEE = 200;
+
 const Checkout = () => {
-  const { items, total, clearCart } = useCart();
+  const { items, total: subtotal, clearCart } = useCart();
+  const total = subtotal + SHIPPING_FEE;
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
   const [loading, setLoading] = useState(false);
@@ -58,7 +61,7 @@ const Checkout = () => {
         customer_phone: form.phone || null,
         shipping_address: form.address,
         items: orderItems,
-        total,
+        subtotal,
         return_url: `${origin}/?payment=success`,
         cancel_url: `${origin}/checkout?payment=cancelled`,
       },
@@ -120,7 +123,15 @@ const Checkout = () => {
                   <p className="font-body text-sm font-semibold">{formatPrice(item.product.price * item.quantity)}</p>
                 </div>
               ))}
-              <div className="border-t border-border pt-4 flex justify-between">
+              <div className="border-t border-border pt-4 space-y-2">
+                <div className="flex justify-between font-body text-sm text-muted-foreground">
+                  <span>Subtotal</span><span>{formatPrice(subtotal)}</span>
+                </div>
+                <div className="flex justify-between font-body text-sm text-muted-foreground">
+                  <span>Shipping</span><span>{formatPrice(SHIPPING_FEE)}</span>
+                </div>
+              </div>
+              <div className="flex justify-between">
                 <span className="font-body font-semibold">Total</span>
                 <span className="font-body font-semibold text-lg">{formatPrice(total)}</span>
               </div>
